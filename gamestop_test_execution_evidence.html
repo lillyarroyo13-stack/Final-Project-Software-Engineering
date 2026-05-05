@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GameStop System — Evidence of Test Execution</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0d0f14;--surface:#13161e;--surface2:#1a1e28;--border:#252a38;--border2:#2e3548;
+    --text:#e8eaf0;--text2:#8b92a8;--text3:#555d78;
+    --accent:#4f7ef8;--accent2:#3a5fd4;
+    --pass:#22c55e;--pass-bg:#0f2a1a;--pass-border:#1a4a2a;
+    --fail:#ef4444;--fail-bg:#2a0f0f;--fail-border:#4a1a1a;
+    --warn:#f59e0b;--warn-bg:#2a1f0a;--warn-border:#4a380a;
+    --critical:#e879f9;--critical-bg:#1e0a2a;--critical-border:#3a1a4a;
+    --mono:'IBM Plex Mono',monospace;--sans:'IBM Plex Sans',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;min-height:100vh;}
+
+  .header{background:var(--surface);border-bottom:1px solid var(--border);padding:32px 48px 28px;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),#a855f7,#22c55e,var(--accent));background-size:300% 100%;animation:gradbar 4s linear infinite;}
+  @keyframes gradbar{0%{background-position:0%}100%{background-position:300%}}
+  .header-top{display:flex;justify-content:space-between;align-items:flex-start;gap:24px;flex-wrap:wrap;}
+  .header-badge{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent);background:rgba(79,126,248,0.1);border:1px solid rgba(79,126,248,0.25);padding:4px 10px;border-radius:4px;display:inline-block;margin-bottom:12px;}
+  .header h1{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--text);letter-spacing:-0.02em;margin-bottom:6px;}
+  .header-meta{font-size:12px;color:var(--text2);font-family:var(--mono);display:flex;gap:20px;flex-wrap:wrap;margin-top:10px;}
+  .dot{width:6px;height:6px;border-radius:50%;background:var(--pass);display:inline-block;animation:pulse 2s ease-in-out infinite;margin-right:4px;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.4}}
+  .exec-stamp{text-align:right;font-family:var(--mono);font-size:11px;color:var(--text3);line-height:1.8;}
+  .exec-stamp strong{color:var(--text2);display:block;font-size:13px;margin-bottom:4px;}
+
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px;padding:28px 48px;}
+  .stat-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:18px 16px;text-align:center;}
+  .stat-card .num{font-family:var(--mono);font-size:30px;font-weight:600;line-height:1;margin-bottom:6px;}
+  .stat-card .lbl{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:0.08em;font-weight:500;}
+  .n-total{color:var(--accent)}.n-pass{color:var(--pass)}.n-fail{color:var(--fail)}.n-warn{color:var(--warn)}.n-crit{color:var(--critical)}
+
+  .progress-wrap{padding:0 48px 28px;}
+  .progress-label{display:flex;justify-content:space-between;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:8px;}
+  .progress-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden;display:flex;}
+  .p-pass{background:var(--pass)}.p-fail{background:var(--fail)}
+
+  .section{padding:0 48px 40px;}
+  .section-title{font-family:var(--mono);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.14em;color:var(--text3);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px;}
+  .section-title::before{content:'';width:3px;height:14px;background:var(--accent);border-radius:2px;display:inline-block;}
+
+  .timeline{display:flex;gap:0;margin-bottom:28px;}
+  .tl-step{flex:1;text-align:center;position:relative;}
+  .tl-step::before{content:'';position:absolute;top:14px;left:50%;right:-50%;height:2px;background:var(--border2);z-index:0;}
+  .tl-step:last-child::before{display:none;}
+  .tl-circle{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10px;font-weight:600;margin:0 auto 8px;position:relative;z-index:1;border:2px solid;}
+  .tl-p{background:var(--pass-bg);border-color:var(--pass);color:var(--pass);}
+  .tl-f{background:var(--fail-bg);border-color:var(--fail);color:var(--fail);}
+  .tl-label{font-size:10px;color:var(--text2);font-family:var(--mono);}
+  .tl-sub{font-size:9px;margin-top:2px;}
+
+  .tc-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin-bottom:20px;overflow:hidden;}
+  .tc-header{display:flex;align-items:center;gap:12px;padding:14px 20px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+  .tc-id{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent);background:rgba(79,126,248,0.1);border:1px solid rgba(79,126,248,0.2);padding:3px 10px;border-radius:4px;white-space:nowrap;}
+  .tc-title{font-size:13px;font-weight:500;color:var(--text);flex:1;}
+  .tc-feature{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:2px 8px;border-radius:4px;}
+  .req-tag{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--surface2);border:1px solid var(--border);padding:1px 6px;border-radius:3px;margin-left:6px;}
+  .sbadge{font-family:var(--mono);font-size:10px;font-weight:600;padding:3px 10px;border-radius:4px;text-transform:uppercase;letter-spacing:0.08em;white-space:nowrap;}
+  .sbadge-pass{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass-border);}
+  .sbadge-fail{background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail-border);}
+
+  .tc-body{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+  .tc-col{padding:14px 20px;border-right:1px solid var(--border);}
+  .tc-col:last-child{border-right:none;}
+  .tc-col-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);margin-bottom:8px;font-weight:600;}
+  .tc-col p{font-size:12px;color:var(--text2);line-height:1.6;}
+
+  .sim-screen{margin:14px 20px;border:1px solid var(--border2);border-radius:8px;overflow:hidden;background:#0a0c10;}
+  .sim-bar{background:var(--surface2);border-bottom:1px solid var(--border);padding:7px 12px;display:flex;align-items:center;gap:8px;}
+  .sim-dots{display:flex;gap:5px;}
+  .sim-dot{width:8px;height:8px;border-radius:50%;}
+  .sim-dot.r{background:#ff5f57;}.sim-dot.y{background:#febc2e;}.sim-dot.g{background:#28c840;}
+  .sim-url{font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg);border:1px solid var(--border);border-radius:3px;padding:2px 10px;flex:1;text-align:center;}
+  .sim-content{padding:14px;font-family:var(--mono);font-size:11px;color:var(--text);min-height:80px;}
+  .cl{margin-bottom:3px;}
+  .cl-ok{color:var(--pass)}.cl-err{color:var(--fail)}.cl-inf{color:var(--accent)}.cl-warn{color:var(--warn)}.cl-dim{color:var(--text3)}
+
+  .mock-alert{background:var(--fail-bg);border:1px solid var(--fail-border);border-radius:5px;padding:9px 12px;margin-top:8px;font-size:11px;color:var(--fail);}
+  .mock-success{background:var(--pass-bg);border:1px solid var(--pass-border);border-radius:5px;padding:9px 12px;margin-top:8px;font-size:11px;color:var(--pass);}
+  .mock-warn{background:var(--warn-bg);border:1px solid var(--warn-border);border-radius:5px;padding:9px 12px;margin-top:8px;font-size:11px;color:var(--warn);}
+  .mock-field{background:var(--surface2);border:1px solid var(--border2);border-radius:4px;padding:5px 9px;font-family:var(--mono);font-size:11px;color:var(--text2);margin-bottom:5px;display:block;}
+  .mock-btn-dis{background:var(--surface2);color:var(--text3);border:1px solid var(--border);border-radius:4px;padding:5px 14px;font-family:var(--mono);font-size:11px;display:inline-block;}
+  .mock-oos{background:var(--fail-bg);border:1px solid var(--fail-border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--fail);font-family:var(--mono);display:inline-block;}
+  .mock-credit{font-family:var(--mono);font-size:18px;font-weight:600;color:var(--pass);margin:6px 0 3px;}
+
+  .result-row{display:flex;gap:10px;align-items:flex-start;padding:11px 20px;border-top:1px solid var(--border);background:var(--surface2);}
+  .result-icon{font-size:13px;margin-top:1px;}
+  .result-text{font-size:12px;color:var(--text2);line-height:1.5;}
+  .result-row.pass{border-left:3px solid var(--pass);}
+  .result-row.fail{border-left:3px solid var(--fail);}
+
+  .defect-table{width:100%;border-collapse:collapse;font-size:12px;}
+  .defect-table th{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);font-weight:600;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border);background:var(--surface2);}
+  .defect-table td{padding:11px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+  .defect-table tr:last-child td{border-bottom:none;}
+  .defect-id{font-family:var(--mono);font-size:12px;color:var(--fail);font-weight:600;}
+  .sev-crit{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--critical-bg);color:var(--critical);border:1px solid var(--critical-border);}
+  .sev-high{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail-border);}
+  .sev-med{font-family:var(--mono);font-size:10px;font-weight:600;padding:2px 8px;border-radius:4px;background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-border);}
+  .def-open{color:var(--fail);font-weight:500;font-size:11px;font-family:var(--mono);}
+
+  .env-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;}
+  .env-card{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:16px;}
+  .env-card-label{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:0.1em;color:var(--text3);font-weight:600;margin-bottom:10px;}
+  .env-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-size:12px;}
+  .env-row:last-child{border-bottom:none;}
+  .env-key{color:var(--text3)}.env-val{color:var(--text);font-family:var(--mono);font-size:11px;}
+
+  .footer{border-top:1px solid var(--border);padding:22px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:var(--surface);}
+  .footer-text{font-family:var(--mono);font-size:11px;color:var(--text3);}
+  .footer-sig{font-family:var(--mono);font-size:11px;color:var(--text2);text-align:right;}
+  code{font-family:var(--mono);font-size:11px;color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div class="header-badge">Test Execution Report — Final Delivery</div>
+      <h1>GameStop Integrated Management System</h1>
+      <p style="color:var(--text2);font-size:13px;margin-top:6px;">Evidence of Test Execution &nbsp;·&nbsp; COMP3400 Software Engineering &nbsp;·&nbsp; Universidad Interamericana de Puerto Rico</p>
+      <div class="header-meta">
+        <span><span class="dot"></span>Test environment: Active</span>
+        <span>Tester: Alexis Y. López Arroyo</span>
+        <span>Supervisor: Prof. Edwin Anaya Almeida</span>
+      </div>
+    </div>
+    <div class="exec-stamp">
+      <strong>Execution summary</strong>
+      Date: May 12, 2026<br>
+      Build: v1.0.0-beta<br>
+      Environment: QA / Staging<br>
+      Browser: Google Chrome 124<br>
+      Database: Local SQL Server
+    </div>
+  </div>
+</div>
+
+<div class="summary-grid">
+  <div class="stat-card"><div class="num n-total">8</div><div class="lbl">Total cases</div></div>
+  <div class="stat-card"><div class="num n-pass">5</div><div class="lbl">Passed</div></div>
+  <div class="stat-card"><div class="num n-fail">3</div><div class="lbl">Failed</div></div>
+  <div class="stat-card"><div class="num n-warn">3</div><div class="lbl">Defects logged</div></div>
+  <div class="stat-card"><div class="num n-crit">1</div><div class="lbl">Critical</div></div>
+  <div class="stat-card"><div class="num n-pass">62.5%</div><div class="lbl">Pass rate</div></div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span>Overall test pass rate</span>
+    <span><span style="color:var(--pass)">5 passed</span> &nbsp;·&nbsp; <span style="color:var(--fail)">3 failed</span></span>
+  </div>
+  <div class="progress-bar">
+    <div class="p-pass" style="width:62.5%"></div>
+    <div class="p-fail" style="width:37.5%"></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Execution timeline</div>
+  <div class="timeline">
+    <div class="tl-step"><div class="tl-circle tl-f">TC1</div><div class="tl-label">Lockout</div><div class="tl-sub" style="color:var(--fail)">Failed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-f">TC2</div><div class="tl-label">Age gate</div><div class="tl-sub" style="color:var(--fail)">Failed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-p">TC3</div><div class="tl-label">Trade-in</div><div class="tl-sub" style="color:var(--pass)">Passed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-p">TC4</div><div class="tl-label">Inventory</div><div class="tl-sub" style="color:var(--pass)">Passed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-f">TC5</div><div class="tl-label">Price sync</div><div class="tl-sub" style="color:var(--fail)">Failed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-p">TC6</div><div class="tl-label">Pre-order</div><div class="tl-sub" style="color:var(--pass)">Passed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-p">TC7</div><div class="tl-label">Pwd reset</div><div class="tl-sub" style="color:var(--pass)">Passed</div></div>
+    <div class="tl-step"><div class="tl-circle tl-p">TC8</div><div class="tl-label">Search</div><div class="tl-sub" style="color:var(--pass)">Passed</div></div>
+  </div>
+</div>
+
+<div class="section">
+  <div class="section-title">Test case execution — detailed evidence</div>
+
+  <!-- TC-01 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-01</span>
+      <span class="tc-title">Account lockout after 3 consecutive failed login attempts<span class="req-tag">RF-03</span></span>
+      <span class="tc-feature">Authentication</span>
+      <span class="sbadge sbadge-fail">Failed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Navigate to <code>gamestop.local/login</code><br>
+        2. Enter valid email: <code>user@test.com</code><br>
+        3. Enter wrong password 3 consecutive times<br>
+        4. Observe system response on 3rd failure</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>Account locked for <strong style="color:var(--text)">5 minutes</strong> after exactly 3 failed attempts. Lockout notification email sent. Counter resets after timeout.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/login — Chrome DevTools Console</div></div>
+      <div class="sim-content">
+        <div class="cl cl-inf">// Attempt 1 of 3</div>
+        <div class="cl cl-warn">POST /api/auth/login → 401 Unauthorized · failedAttempts: 1</div>
+        <div class="cl cl-inf">// Attempt 2 of 3</div>
+        <div class="cl cl-warn">POST /api/auth/login → 401 Unauthorized · failedAttempts: 2</div>
+        <div class="cl cl-inf">// Attempt 3 — lockout threshold should trigger HERE</div>
+        <div class="cl cl-warn">POST /api/auth/login → 401 Unauthorized · failedAttempts: 3</div>
+        <div class="cl cl-err">⚠ Account NOT locked. System allowed attempts 4 and 5.</div>
+        <div class="cl cl-inf">// Attempt 5</div>
+        <div class="cl cl-ok">POST /api/auth/login → 423 Locked · Account blocked (triggered at 5th attempt)</div>
+        <div class="mock-alert">DEF-01 · Lockout fired at attempt 5 instead of 3. <code>MAX_ATTEMPTS</code> constant misconfigured in Auth Service (value = 5, expected = 3).</div>
+      </div>
+    </div>
+    <div class="result-row fail">
+      <span class="result-icon">✗</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> Account locked only after the 5th failed attempt. Defect logged as <strong style="color:var(--fail)">DEF-01 (High)</strong>. Root cause: <code>MAX_ATTEMPTS</code> constant set to 5 instead of 3 in Auth Service configuration file. Requirement RF-03 NOT met.</div>
+    </div>
+  </div>
+
+  <!-- TC-02 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-02</span>
+      <span class="tc-title">Age verification gate blocks M-rated game checkout for underage profile<span class="req-tag">RF-05</span></span>
+      <span class="tc-feature">Age Policy</span>
+      <span class="sbadge sbadge-fail">Failed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Log in as customer DOB: <code>2015-03-10</code> (age 10)<br>
+        2. Navigate to <em>Elden Ring</em> (ESRB: Mature 17+)<br>
+        3. Add to cart → proceed to checkout<br>
+        4. Leave DOB field empty and click "Buy Now"</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>"Buy Now" button disabled until valid DOB confirms age ≥ 17. Checkout blocked. Warning message displayed. Empty DOB treated as invalid.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/checkout — Age Verification Step</div></div>
+      <div class="sim-content">
+        <div class="cl cl-dim">Product: Elden Ring (PS5) · ESRB: M (Mature 17+)</div>
+        <span class="mock-field">Date of birth: [                    ] ← submitted empty</span>
+        <div class="cl cl-err">// Expected: "Buy Now" button stays disabled on empty DOB</div>
+        <div class="cl cl-err">// Actual:   Button enabled — frontend validation skipped on empty string</div>
+        <div class="cl cl-warn">POST /api/orders/create → 201 Created (should have been 422)</div>
+        <div class="cl cl-err">Order ORD-20260512-0099 created for underage profile · Age check bypassed</div>
+        <div class="mock-alert">DEF-02 · CRITICAL — Age gate bypassed by submitting empty DOB. No null/empty guard on server side. Purchase processed for a minor.</div>
+      </div>
+    </div>
+    <div class="result-row fail">
+      <span class="result-icon">✗</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> Empty DOB bypassed age gate. Order created for underage profile. Defect logged as <strong style="color:var(--critical)">DEF-02 (Critical)</strong>. Fix required: add <code>required</code> + null check + server-side ESRB guard before order creation. RF-05 NOT met.</div>
+    </div>
+  </div>
+
+  <!-- TC-03 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-03</span>
+      <span class="tc-title">Trade-in value applies lower condition factor for "Used" state<span class="req-tag">RF-08</span></span>
+      <span class="tc-feature">Trade-in</span>
+      <span class="sbadge sbadge-pass">Passed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Clerk opens Trade-in Valuation module<br>
+        2. Selects: <em>PlayStation 5 Console</em> · SKU: PS5-001<br>
+        3. Sets condition dropdown to <strong style="color:var(--text)">Used</strong><br>
+        4. Observes estimated store credit result</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>System applies condition depreciation factor (≤0.55× for Used). Estimated credit lower than Like New baseline. Value displayed before customer confirms trade.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/clerk/trade-in — Postman API log</div></div>
+      <div class="sim-content">
+        <div class="cl cl-inf">GET /api/tradein/estimate?sku=PS5-001&amp;condition=used</div>
+        <div class="cl cl-ok">200 OK · { basePrice: 350.00, conditionFactor: 0.49, estimatedCredit: 171.50 }</div>
+        <div class="cl cl-inf">// Compared against Like New baseline</div>
+        <div class="cl cl-ok">GET /api/tradein/estimate?sku=PS5-001&amp;condition=like_new → credit: $245.00 (factor 0.70)</div>
+        <div class="cl cl-ok">Used ($171.50) &lt; Like New ($245.00) ✓ — Condition factor applied correctly</div>
+        <div class="mock-credit">Estimated store credit: $171.50</div>
+        <div class="mock-success">Trade-in engine applied factor 0.49× to base price $350.00. Result accurately lower than Like New. RF-08 satisfied.</div>
+      </div>
+    </div>
+    <div class="result-row pass">
+      <span class="result-icon">✓</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> System returned $171.50 for Used condition (factor 0.49×), correctly lower than Like New ($245.00, factor 0.70×). Condition depreciation algorithm working as designed. RF-08 satisfied.</div>
+    </div>
+  </div>
+
+  <!-- TC-04 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-04</span>
+      <span class="tc-title">"Add to Cart" disabled and API rejects force-add for out-of-stock item<span class="req-tag">RF-10</span></span>
+      <span class="tc-feature">Inventory</span>
+      <span class="sbadge sbadge-pass">Passed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Set <code>stockQty = 0</code> for Xbox Series X in test DB<br>
+        2. Navigate to product listing page<br>
+        3. Observe "Add to Cart" button state<br>
+        4. Force-add via direct API call (Postman)</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>"Add to Cart" visually disabled. "Out of Stock" badge shown. Direct API add-to-cart returns HTTP 409 Conflict. Stock cannot be bypassed.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/products/xbox-series-x</div></div>
+      <div class="sim-content">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:12px;color:var(--text)">Xbox Series X · SKU: XBX-001</span>
+          <span class="mock-oos">Out of Stock</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;">
+          <span style="font-family:var(--mono);font-size:12px;color:var(--text)">$499.99</span>
+          <span class="mock-btn-dis">Add to Cart (disabled)</span>
+        </div>
+        <div class="cl cl-inf">// Force-add attempt via Postman</div>
+        <div class="cl cl-ok">POST /api/cart/add { sku: "XBX-001", qty: 1 } → 409 Conflict</div>
+        <div class="cl cl-ok">Response: { error: "Product out of stock", sku: "XBX-001" }</div>
+        <div class="mock-success">UI button disabled. API rejected force-add with 409. Real-time inventory check confirmed. RF-10 satisfied.</div>
+      </div>
+    </div>
+    <div class="result-row pass">
+      <span class="result-icon">✓</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> Button rendered disabled. "Out of Stock" badge displayed. Force-add via Postman returned HTTP 409 Conflict with descriptive error. Server-side inventory check not bypassable. RF-10 satisfied.</div>
+    </div>
+  </div>
+
+  <!-- TC-05 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-05</span>
+      <span class="tc-title">Cart total re-syncs to regular price when promotional sale expires<span class="req-tag">RF-10</span></span>
+      <span class="tc-feature">Price Sync</span>
+      <span class="sbadge sbadge-fail">Failed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Add <em>Elden Ring</em> during Spring Sale ($39.99)<br>
+        2. Simulate expiry: <code>UPDATE promotions SET active=false</code><br>
+        3. Return to cart without page refresh<br>
+        4. Proceed to checkout — verify displayed price</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>Cart refreshes to regular price ($49.99) after sale expiry. User notified of price change. Checkout blocked until cart re-confirmed with updated total.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/cart — Price sync test</div></div>
+      <div class="sim-content">
+        <div class="cl cl-inf">// Spring Sale expired — DB updated</div>
+        <div class="cl cl-warn">UPDATE promotions SET active=false WHERE promoId='SPRING24' → OK</div>
+        <div class="cl cl-inf">// Cart re-opened without page refresh</div>
+        <div class="cl cl-err">Cart displays: Elden Ring — $39.99 (Spring Sale) ← stale</div>
+        <div class="cl cl-err">Expected: $49.99 (regular price) after promo expiry</div>
+        <div class="cl cl-warn">POST /api/orders/checkout → 201 OK (order at incorrect $39.99)</div>
+        <div class="cl cl-err">Server did not re-verify price before processing order</div>
+        <div class="mock-alert">DEF-03 · Cart did not invalidate stale promo price. Cache-invalidation event not triggered. Checkout processed with wrong total.</div>
+      </div>
+    </div>
+    <div class="result-row fail">
+      <span class="result-icon">✗</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> Cart retained stale sale price after expiry. Checkout processed at $39.99 instead of $49.99. Defect logged as <strong style="color:var(--warn)">DEF-03 (Medium)</strong>. Fix: Cron Job cache invalidation + mandatory server-side price re-check before order write. RF-10 partially met.</div>
+    </div>
+  </div>
+
+  <!-- TC-06 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-06</span>
+      <span class="tc-title">Pre-order created and status updated with email notification on release<span class="req-tag">RF-06</span></span>
+      <span class="tc-feature">Pre-order</span>
+      <span class="sbadge sbadge-pass">Passed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Navigate to upcoming release: <em>Grand Theft Auto VI</em><br>
+        2. Click "Pre-order Now" and confirm payment<br>
+        3. Simulate release date trigger in DB<br>
+        4. Verify email notification and order status change</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>Order created with status "Pre-order". On release date trigger, status → "Ready to Ship". Notification email dispatched automatically.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/products/gta-vi — Pre-order flow</div></div>
+      <div class="sim-content">
+        <div class="cl cl-inf">POST /api/orders/preorder { sku: 'GTAVI-PS5', userId: 'usr_293' }</div>
+        <div class="cl cl-ok">201 Created · orderId: ORD-20260512-0041 · status: "Pre-order"</div>
+        <div class="cl cl-inf">// Simulating release date trigger via CRON</div>
+        <div class="cl cl-ok">CRON → UPDATE orders SET status='Ready to Ship' WHERE sku='GTAVI-PS5' · 1 row</div>
+        <div class="cl cl-ok">Notification email → user@test.com: "Your pre-order is ready to ship!" · Mailtrap confirmed</div>
+        <div class="mock-success">Pre-order record created. Status updated on release. Email confirmed in Mailtrap log. RF-06 fully satisfied.</div>
+      </div>
+    </div>
+    <div class="result-row pass">
+      <span class="result-icon">✓</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> Pre-order created with status "Pre-order". CRON trigger updated to "Ready to Ship" on simulated release. Email delivered and confirmed in Mailtrap. RF-06 fully satisfied.</div>
+    </div>
+  </div>
+
+  <!-- TC-07 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-07</span>
+      <span class="tc-title">Password reset link delivered, expires after 24h, no user enumeration<span class="req-tag">RF-01</span></span>
+      <span class="tc-feature">Authentication</span>
+      <span class="sbadge sbadge-pass">Passed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Click "Forgot Password" on login page<br>
+        2. Submit registered email, then unregistered email<br>
+        3. Confirm token in Mailtrap · click link<br>
+        4. Repeat with expired token (24h+ old)</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>Unique reset token emailed. Expired link returns error. Both registered and unregistered emails return same generic message (no user enumeration).</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/forgot-password</div></div>
+      <div class="sim-content">
+        <div class="cl cl-ok">POST /api/auth/reset-request · email: user@test.com → 200</div>
+        <div class="cl cl-ok">Token generated · expiresAt: +24h · Mailtrap: email delivered ✓</div>
+        <div class="cl cl-ok">Response body: "You will receive a link via email." (generic)</div>
+        <div class="cl cl-inf">// Unknown email test — checking enumeration</div>
+        <div class="cl cl-ok">POST /api/auth/reset-request · email: unknown@x.com → 200</div>
+        <div class="cl cl-ok">Same generic response body ✓ — no user enumeration</div>
+        <div class="cl cl-inf">// Expired link test</div>
+        <div class="cl cl-warn">GET /api/auth/reset?token=expired_abc → 410 Gone · "Link has expired"</div>
+        <div class="mock-success">Token expiry enforced. Generic message prevents enumeration. Reset flow secure. RF-01 satisfied.</div>
+      </div>
+    </div>
+    <div class="result-row pass">
+      <span class="result-icon">✓</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> Token generated with 24h expiry. Both registered and unregistered emails returned identical generic response. Expired token returned HTTP 410. No user enumeration risk. RF-01 satisfied.</div>
+    </div>
+  </div>
+
+  <!-- TC-08 -->
+  <div class="tc-card">
+    <div class="tc-header">
+      <span class="tc-id">TC-08</span>
+      <span class="tc-title">Search filters return accurate results by platform, genre, and condition<span class="req-tag">RF-07</span></span>
+      <span class="tc-feature">Search / Filter</span>
+      <span class="sbadge sbadge-pass">Passed</span>
+    </div>
+    <div class="tc-body">
+      <div class="tc-col">
+        <div class="tc-col-label">Steps</div>
+        <p>1. Apply filter: <strong style="color:var(--text)">Platform = PS5</strong>, <strong style="color:var(--text)">Genre = Action</strong><br>
+        2. Verify all results match filters<br>
+        3. Add filter: <strong style="color:var(--text)">Condition = Used</strong><br>
+        4. Measure response time vs. 3-second NFR threshold</p>
+      </div>
+      <div class="tc-col">
+        <div class="tc-col-label">Expected result</div>
+        <p>Only matching products returned per active filters. Response time under 3 seconds (NFR-01). Condition filter correctly narrows results subset.</p>
+      </div>
+    </div>
+    <div class="sim-screen">
+      <div class="sim-bar"><div class="sim-dots"><div class="sim-dot r"></div><div class="sim-dot y"></div><div class="sim-dot g"></div></div><div class="sim-url">gamestop.local/catalog?platform=PS5&genre=Action&condition=Used</div></div>
+      <div class="sim-content">
+        <div class="cl cl-inf">GET /api/products?platform=PS5&amp;genre=Action</div>
+        <div class="cl cl-ok">200 OK · 12 results · responseTime: 280ms ✓ (threshold: 3000ms)</div>
+        <div class="cl cl-ok">Verified: all 12 products → platform: PS5, genre: Action ✓</div>
+        <div class="cl cl-inf">GET /api/products?platform=PS5&amp;genre=Action&amp;condition=Used</div>
+        <div class="cl cl-ok">200 OK · 5 results · responseTime: 312ms ✓</div>
+        <div class="cl cl-ok">Verified: all 5 products → platform: PS5, genre: Action, condition: Used ✓</div>
+        <div class="mock-success">Filter accuracy confirmed. Response times 280–312ms — well within 3-second NFR. RF-07 and NFR-01 both satisfied.</div>
+      </div>
+    </div>
+    <div class="result-row pass">
+      <span class="result-icon">✓</span>
+      <div class="result-text"><strong style="color:var(--text)">Actual result:</strong> All filter combinations returned accurate subsets. Response time 280–312ms, well under the 3-second performance requirement. RF-07 and NFR-01 both satisfied.</div>
+    </div>
+  </div>
+</div>
+
+<!-- DEFECT LOG -->
+<div class="section">
+  <div class="section-title">Defect log</div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;">
+    <table class="defect-table">
+      <thead>
+        <tr>
+          <th>Defect ID</th>
+          <th>Linked TC</th>
+          <th>Description</th>
+          <th>Severity</th>
+          <th>Req. ID</th>
+          <th>Status</th>
+          <th>Recommended fix</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="defect-id">DEF-01</span></td>
+          <td><code>TC-01</code></td>
+          <td>Account locked at 5th failed attempt instead of 3rd</td>
+          <td><span class="sev-high">High</span></td>
+          <td><code>RF-03</code></td>
+          <td><span class="def-open">Open</span></td>
+          <td>Set <code>MAX_ATTEMPTS = 3</code> in Auth Service config</td>
+        </tr>
+        <tr>
+          <td><span class="defect-id">DEF-02</span></td>
+          <td><code>TC-02</code></td>
+          <td>Age verification gate bypassed by submitting empty DOB — underage purchase processed</td>
+          <td><span class="sev-crit">Critical</span></td>
+          <td><code>RF-05</code></td>
+          <td><span class="def-open">Open</span></td>
+          <td>Add <code>required</code> to DOB field + null check + server-side ESRB guard before order creation</td>
+        </tr>
+        <tr>
+          <td><span class="defect-id">DEF-03</span></td>
+          <td><code>TC-05</code></td>
+          <td>Cart total retained stale promotional price after expiry — checkout processed at wrong amount</td>
+          <td><span class="sev-med">Medium</span></td>
+          <td><code>RF-10</code></td>
+          <td><span class="def-open">Open</span></td>
+          <td>Implement Cron Job cache invalidation on promo expiry + server-side price re-verification at checkout trigger</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ENVIRONMENT -->
+<div class="section">
+  <div class="section-title">Test environment configuration</div>
+  <div class="env-grid">
+    <div class="env-card">
+      <div class="env-card-label">Client</div>
+      <div class="env-row"><span class="env-key">Browser</span><span class="env-val">Chrome 124</span></div>
+      <div class="env-row"><span class="env-key">OS</span><span class="env-val">Windows 11 Pro</span></div>
+      <div class="env-row"><span class="env-key">Resolution</span><span class="env-val">1920×1080</span></div>
+      <div class="env-row"><span class="env-key">JS enabled</span><span class="env-val" style="color:var(--pass)">Yes</span></div>
+    </div>
+    <div class="env-card">
+      <div class="env-card-label">App server</div>
+      <div class="env-row"><span class="env-key">Environment</span><span class="env-val">QA / Staging</span></div>
+      <div class="env-row"><span class="env-key">Host</span><span class="env-val">localhost:8080</span></div>
+      <div class="env-row"><span class="env-key">Pattern</span><span class="env-val">MVC / REST</span></div>
+      <div class="env-row"><span class="env-key">Auth</span><span class="env-val">JWT + AES-256</span></div>
+    </div>
+    <div class="env-card">
+      <div class="env-card-label">Database</div>
+      <div class="env-row"><span class="env-key">Engine</span><span class="env-val">SQL Server</span></div>
+      <div class="env-row"><span class="env-key">Seed data</span><span class="env-val">Mock inventory</span></div>
+      <div class="env-row"><span class="env-key">Test users</span><span class="env-val">5 accounts</span></div>
+      <div class="env-row"><span class="env-key">Transactions</span><span class="env-val">ACID enabled</span></div>
+    </div>
+    <div class="env-card">
+      <div class="env-card-label">Tools</div>
+      <div class="env-row"><span class="env-key">Manual</span><span class="env-val">Chrome DevTools</span></div>
+      <div class="env-row"><span class="env-key">API</span><span class="env-val">Postman v11</span></div>
+      <div class="env-row"><span class="env-key">Unit tests</span><span class="env-val">JUnit 5</span></div>
+      <div class="env-row"><span class="env-key">Mail</span><span class="env-val">Mailtrap SMTP</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-text">
+    GameStop IMS · Evidence of Test Execution · COMP3400 Software Engineering<br>
+    Universidad Interamericana de Puerto Rico · Prof. Edwin Anaya Almeida
+  </div>
+  <div class="footer-sig">
+    Prepared by: Alexis Y. López Arroyo<br>
+    Date: May 12, 2026 · Build v1.0.0-beta<br>
+    <span style="color:var(--fail)">3 defects open</span> · <span style="color:var(--pass)">5 / 8 test cases passed</span>
+  </div>
+</div>
+
+</body>
+</html>

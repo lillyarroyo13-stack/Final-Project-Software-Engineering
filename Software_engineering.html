@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Software engineering.html</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;600;700&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Exo 2', 'Segoe UI', sans-serif;
+    background: #f4f4f6;
+    color: #1a1a2e;
+    min-height: 100vh;
+  }
+
+  /* ── TAB NAV ── */
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    background: #fff;
+    border-bottom: 3px solid #c8102e;
+    padding: 0 24px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,.12);
+  }
+  .tab-btn {
+    padding: 14px 22px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: .5px;
+    color: #555;
+    border-bottom: 3px solid transparent;
+    margin-bottom: -3px;
+    transition: all .2s;
+  }
+  .tab-btn:hover { color: #c8102e; }
+  .tab-btn.active { color: #c8102e; border-bottom-color: #c8102e; background: #fff8f8; }
+
+  /* ── LEGEND ── */
+  .legend {
+    display: flex; gap: 18px; padding: 14px 24px 0;
+    flex-wrap: wrap; align-items: center;
+  }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #444; font-weight: 600; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
+  /* ── PANELS ── */
+  .tab-panel { display: none; padding: 24px; }
+  .tab-panel.active { display: block; }
+
+  /* ── DIAGRAM CARD ── */
+  .diagram-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,.08);
+    padding: 20px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+  }
+  .diagram-card h2 {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: #c8102e;
+    margin-bottom: 16px;
+    letter-spacing: .5px;
+    text-transform: uppercase;
+  }
+
+  /* ── SEQUENCE BADGES ── */
+  .seq-badges { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+  .seq-badge {
+    padding: 6px 14px; border-radius: 20px; border: 2px solid #c8102e;
+    background: #fff; color: #c8102e; font-size: 12px; font-weight: 700;
+    cursor: pointer; transition: all .2s; font-family: 'Exo 2', sans-serif;
+  }
+  .seq-badge.active { background: #c8102e; color: #fff; }
+
+  /* ── UI PROTO GRID ── */
+  .proto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 20px; }
+  .proto-screen {
+    background: #fff; border-radius: 10px; overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,.1); border: 1px solid #eee;
+  }
+  .proto-bar {
+    background: #c8102e; padding: 8px 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .proto-bar span { color: #fff; font-size: 12px; font-weight: 700; font-family: 'Rajdhani', sans-serif; letter-spacing: .5px; }
+  .proto-dots { display: flex; gap: 5px; }
+  .proto-dots div { width: 10px; height: 10px; border-radius: 50%; }
+  .proto-body { padding: 16px; }
+
+  svg { display: block; }
+</style>
+</head>
+<body>
+
+<!-- TAB NAV -->
+<nav class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('arch')">Architecture</button>
+  <button class="tab-btn" onclick="showTab('class')">Class diagram</button>
+  <button class="tab-btn" onclick="showTab('seq')">Sequence</button>
+  <button class="tab-btn" onclick="showTab('act')">Activity</button>
+  <button class="tab-btn" onclick="showTab('db')">Database</button>
+  <button class="tab-btn" onclick="showTab('ui')">UI prototype</button>
+</nav>
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 1 — ARCHITECTURE
+════════════════════════════════════════════════════════ -->
+<div id="tab-arch" class="tab-panel active">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4a90d9"></div>Presentation</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div>Business logic</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>Data / storage</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#c0392b"></div>Security</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8e44ad"></div>External</div>
+  </div>
+  <div class="diagram-card">
+    <h2>3-Tier MVC Architecture — GameStop System</h2>
+    <svg viewBox="0 0 1100 760" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Exo 2',sans-serif">
+
+      <!-- PRESENTATION LAYER -->
+      <rect x="20" y="10" width="1060" height="120" rx="10" fill="#dbeeff" stroke="#4a90d9" stroke-width="2"/>
+      <text x="40" y="35" font-size="13" font-weight="700" fill="#1a5fa8">PRESENTATION LAYER</text>
+      <!-- clients -->
+      <rect x="50" y="45" width="130" height="70" rx="8" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="115" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Web Browser</text>
+      <text x="115" y="92" text-anchor="middle" font-size="10" fill="#d0e8ff">HTML5 / CSS3 / JS</text>
+      <rect x="210" y="45" width="130" height="70" rx="8" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="275" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Mobile App</text>
+      <text x="275" y="92" text-anchor="middle" font-size="10" fill="#d0e8ff">React Native</text>
+      <rect x="370" y="45" width="130" height="70" rx="8" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="435" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Admin Panel</text>
+      <text x="435" y="92" text-anchor="middle" font-size="10" fill="#d0e8ff">Clerk / Manager UI</text>
+      <rect x="530" y="45" width="130" height="70" rx="8" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="595" y="75" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">POS Terminal</text>
+      <text x="595" y="92" text-anchor="middle" font-size="10" fill="#d0e8ff">In-Store System</text>
+
+      <!-- arrows down -->
+      <text x="550" y="150" text-anchor="middle" font-size="11" font-weight="700" fill="#c8102e">HTTPS / REST API</text>
+      <line x1="550" y1="130" x2="550" y2="170" stroke="#c8102e" stroke-width="2.5" marker-end="url(#arr)"/>
+
+      <!-- BUSINESS LOGIC LAYER -->
+      <rect x="20" y="175" width="1060" height="230" rx="10" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+      <text x="40" y="200" font-size="13" font-weight="700" fill="#1a7a40">BUSINESS LOGIC LAYER  — Spring Boot MVC Controllers</text>
+
+      <!-- 8 services -->
+      <!-- Auth -->
+      <rect x="50" y="210" width="120" height="75" rx="7" fill="#27ae60" stroke="#1a7a40" stroke-width="1.5"/>
+      <text x="110" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Auth Service</text>
+      <text x="110" y="253" text-anchor="middle" font-size="9" fill="#c8ffd4">MFA · Lockout</text>
+      <text x="110" y="267" text-anchor="middle" font-size="9" fill="#c8ffd4">JWT · BCrypt</text>
+      <!-- Order -->
+      <rect x="190" y="210" width="120" height="75" rx="7" fill="#27ae60" stroke="#1a7a40" stroke-width="1.5"/>
+      <text x="250" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Order Service</text>
+      <text x="250" y="253" text-anchor="middle" font-size="9" fill="#c8ffd4">Cart · Checkout</text>
+      <text x="250" y="267" text-anchor="middle" font-size="9" fill="#c8ffd4">ACID Txn</text>
+      <!-- Inventory -->
+      <rect x="330" y="210" width="120" height="75" rx="7" fill="#27ae60" stroke="#1a7a40" stroke-width="1.5"/>
+      <text x="390" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Inventory Svc</text>
+      <text x="390" y="253" text-anchor="middle" font-size="9" fill="#c8ffd4">Stock · Pre-order</text>
+      <text x="390" y="267" text-anchor="middle" font-size="9" fill="#c8ffd4">SKU Mgmt</text>
+      <!-- Trade-in -->
+      <rect x="470" y="210" width="120" height="75" rx="7" fill="#27ae60" stroke="#1a7a40" stroke-width="1.5"/>
+      <text x="530" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Trade-in Engine</text>
+      <text x="530" y="253" text-anchor="middle" font-size="9" fill="#c8ffd4">Condition Score</text>
+      <text x="530" y="267" text-anchor="middle" font-size="9" fill="#c8ffd4">Credit Calc</text>
+      <!-- Age -->
+      <rect x="610" y="210" width="120" height="75" rx="7" fill="#27ae60" stroke="#1a7a40" stroke-width="1.5"/>
+      <text x="670" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Age Verification</text>
+      <text x="670" y="253" text-anchor="middle" font-size="9" fill="#c8ffd4">ESRB Gate</text>
+      <text x="670" y="267" text-anchor="middle" font-size="9" fill="#c8ffd4">DOB Validation</text>
+      <!-- Payment -->
+      <rect x="750" y="210" width="120" height="75" rx="7" fill="#27ae60" stroke="#1a7a40" stroke-width="1.5"/>
+      <text x="810" y="238" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Payment Svc</text>
+      <text x="810" y="253" text-anchor="middle" font-size="9" fill="#c8ffd4">AES-256 Enc</text>
+      <text x="810" y="267" text-anchor="middle" font-size="9" fill="#c8ffd4">PCI-DSS</text>
+      <!-- Notifications -->
+      <rect x="50" y="305" width="120" height="70" rx="7" fill="#1e8449" stroke="#145a32" stroke-width="1.5"/>
+      <text x="110" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Notification Svc</text>
+      <text x="110" y="345" text-anchor="middle" font-size="9" fill="#c8ffd4">Email · Push</text>
+      <text x="110" y="360" text-anchor="middle" font-size="9" fill="#c8ffd4">SMTP</text>
+      <!-- Promo -->
+      <rect x="190" y="305" width="120" height="70" rx="7" fill="#1e8449" stroke="#145a32" stroke-width="1.5"/>
+      <text x="250" y="330" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Promo Service</text>
+      <text x="250" y="345" text-anchor="middle" font-size="9" fill="#c8ffd4">Discount Codes</text>
+      <text x="250" y="360" text-anchor="middle" font-size="9" fill="#c8ffd4">Cron Expiry</text>
+
+      <!-- SECURITY CROSS-CUT banner -->
+      <rect x="890" y="210" width="170" height="165" rx="7" fill="#f1948a" stroke="#c0392b" stroke-width="2"/>
+      <text x="975" y="235" text-anchor="middle" font-size="11" font-weight="700" fill="#7b241c">SECURITY LAYER</text>
+      <text x="975" y="255" text-anchor="middle" font-size="10" fill="#7b241c">SSL/TLS 1.3</text>
+      <text x="975" y="272" text-anchor="middle" font-size="10" fill="#7b241c">AES-256 Encryption</text>
+      <text x="975" y="289" text-anchor="middle" font-size="10" fill="#7b241c">MFA (TOTP)</text>
+      <text x="975" y="306" text-anchor="middle" font-size="10" fill="#7b241c">Account Lockout</text>
+      <text x="975" y="323" text-anchor="middle" font-size="10" fill="#7b241c">ESRB Hard Gate</text>
+      <text x="975" y="340" text-anchor="middle" font-size="10" fill="#7b241c">Input Sanitization</text>
+      <text x="975" y="357" text-anchor="middle" font-size="10" fill="#7b241c">RBAC Roles</text>
+      <text x="975" y="374" text-anchor="middle" font-size="10" fill="#7b241c">Audit Logging</text>
+
+      <!-- arrow down -->
+      <line x1="550" y1="405" x2="550" y2="440" stroke="#e67e22" stroke-width="2.5" marker-end="url(#arr2)"/>
+      <text x="560" y="428" font-size="11" font-weight="700" fill="#e67e22">JPA / Hibernate ORM</text>
+
+      <!-- DATA LAYER -->
+      <rect x="20" y="445" width="1060" height="120" rx="10" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+      <text x="40" y="470" font-size="13" font-weight="700" fill="#935116">DATA / STORAGE LAYER</text>
+      <!-- MySQL -->
+      <rect x="50" y="480" width="140" height="65" rx="7" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="120" y="507" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">MySQL 8</text>
+      <text x="120" y="523" text-anchor="middle" font-size="9" fill="#ffe0b2">Primary DB</text>
+      <text x="120" y="537" text-anchor="middle" font-size="9" fill="#ffe0b2">ACID · Transactions</text>
+      <!-- Redis -->
+      <rect x="210" y="480" width="140" height="65" rx="7" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="280" y="507" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Redis Cache</text>
+      <text x="280" y="523" text-anchor="middle" font-size="9" fill="#ffe0b2">Session · Cart</text>
+      <text x="280" y="537" text-anchor="middle" font-size="9" fill="#ffe0b2">Token Store</text>
+      <!-- S3 -->
+      <rect x="370" y="480" width="140" height="65" rx="7" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="440" y="507" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">AWS S3</text>
+      <text x="440" y="523" text-anchor="middle" font-size="9" fill="#ffe0b2">Product Images</text>
+      <text x="440" y="537" text-anchor="middle" font-size="9" fill="#ffe0b2">Static Assets</text>
+      <!-- Backup -->
+      <rect x="530" y="480" width="140" height="65" rx="7" fill="#ca6f1e" stroke="#935116" stroke-width="1.5"/>
+      <text x="600" y="507" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">MySQL Replica</text>
+      <text x="600" y="523" text-anchor="middle" font-size="9" fill="#ffe0b2">Read Replica</text>
+      <text x="600" y="537" text-anchor="middle" font-size="9" fill="#ffe0b2">Failover / Backup</text>
+
+      <!-- EXTERNAL LAYER -->
+      <rect x="20" y="590" width="1060" height="110" rx="10" fill="#e8daef" stroke="#8e44ad" stroke-width="2"/>
+      <text x="40" y="615" font-size="13" font-weight="700" fill="#5b2c6f">EXTERNAL INTEGRATIONS</text>
+      <rect x="50" y="625" width="140" height="60" rx="7" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="120" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Payment Gateway</text>
+      <text x="120" y="666" text-anchor="middle" font-size="9" fill="#e8daef">Stripe / PayPal API</text>
+      <rect x="210" y="625" width="140" height="60" rx="7" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="280" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Email Service</text>
+      <text x="280" y="666" text-anchor="middle" font-size="9" fill="#e8daef">SendGrid SMTP</text>
+      <rect x="370" y="625" width="140" height="60" rx="7" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="440" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Supplier APIs</text>
+      <text x="440" y="666" text-anchor="middle" font-size="9" fill="#e8daef">Sony · MS · Nintendo</text>
+      <rect x="530" y="625" width="140" height="60" rx="7" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="600" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">AWS Cloud</text>
+      <text x="600" y="666" text-anchor="middle" font-size="9" fill="#e8daef">EC2 · RDS · CloudFront</text>
+      <rect x="690" y="625" width="140" height="60" rx="7" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="760" y="650" text-anchor="middle" font-size="11" font-weight="700" fill="#fff">Push Notifications</text>
+      <text x="760" y="666" text-anchor="middle" font-size="9" fill="#e8daef">Firebase FCM</text>
+
+      <!-- Arrow markers -->
+      <defs>
+        <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#c8102e"/>
+        </marker>
+        <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#e67e22"/>
+        </marker>
+      </defs>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 2 — CLASS DIAGRAM
+════════════════════════════════════════════════════════ -->
+<div id="tab-class" class="tab-panel">
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#4a90d9"></div>User domain</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#27ae60"></div>Product domain</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>Order domain</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#8e44ad"></div>Trade-in domain</div>
+  </div>
+  <div class="diagram-card">
+    <h2>UML Class Diagram</h2>
+    <svg viewBox="0 0 1100 780" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Exo 2',sans-serif;font-size:11px">
+      <defs>
+        <marker id="inh" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto">
+          <polygon points="0,0 10,5 0,10" fill="#fff" stroke="#555" stroke-width="1.5"/>
+        </marker>
+        <marker id="assoc" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#555"/>
+        </marker>
+        <marker id="comp" markerWidth="12" markerHeight="10" refX="0" refY="5" orient="auto">
+          <polygon points="0,5 5,0 10,5 5,10" fill="#555"/>
+        </marker>
+      </defs>
+
+      <!-- ── «abstract» User ── -->
+      <g transform="translate(380,10)">
+        <rect width="200" height="155" rx="6" fill="#dbeeff" stroke="#4a90d9" stroke-width="2"/>
+        <rect width="200" height="28" rx="6" fill="#4a90d9"/>
+        <rect y="22" width="200" height="6" fill="#4a90d9"/>
+        <text x="100" y="14" text-anchor="middle" font-size="9" fill="#d0e8ff">«abstract»</text>
+        <text x="100" y="26" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">User</text>
+        <line x1="0" y1="58" x2="200" y2="58" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="73" fill="#1a3a5e">- userId : int (PK)</text>
+        <text x="8" y="88" fill="#1a3a5e">- username : String</text>
+        <text x="8" y="103" fill="#1a3a5e">- email : String</text>
+        <text x="8" y="118" fill="#1a3a5e">- passwordHash : String</text>
+        <text x="8" y="133" fill="#1a3a5e">- role : Enum</text>
+        <line x1="0" y1="140" x2="200" y2="140" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="153" fill="#1a3a5e">+ login() : boolean</text>
+      </g>
+
+      <!-- ── Customer ── -->
+      <g transform="translate(80,230)">
+        <rect width="210" height="175" rx="6" fill="#dbeeff" stroke="#4a90d9" stroke-width="2"/>
+        <rect width="210" height="28" rx="6" fill="#4a90d9"/>
+        <rect y="22" width="210" height="6" fill="#4a90d9"/>
+        <text x="105" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Customer</text>
+        <line x1="0" y1="58" x2="210" y2="58" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="73" fill="#1a3a5e">- dob : Date</text>
+        <text x="8" y="88" fill="#1a3a5e">- failedAttempts : int</text>
+        <text x="8" y="103" fill="#1a3a5e">- lockedUntil : DateTime</text>
+        <text x="8" y="118" fill="#1a3a5e">- mfaEnabled : boolean</text>
+        <text x="8" y="133" fill="#1a3a5e">- storeCreditBalance : float</text>
+        <line x1="0" y1="141" x2="210" y2="141" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="156" fill="#1a3a5e">+ placeOrder() : Order</text>
+        <text x="8" y="171" fill="#1a3a5e">+ isOver18() : boolean</text>
+      </g>
+
+      <!-- ── Clerk ── -->
+      <g transform="translate(380,230)">
+        <rect width="200" height="155" rx="6" fill="#dbeeff" stroke="#4a90d9" stroke-width="2"/>
+        <rect width="200" height="28" rx="6" fill="#4a90d9"/>
+        <rect y="22" width="200" height="6" fill="#4a90d9"/>
+        <text x="100" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Clerk</text>
+        <line x1="0" y1="58" x2="200" y2="58" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="73" fill="#1a3a5e">- storeId : int</text>
+        <text x="8" y="88" fill="#1a3a5e">- employeeCode : String</text>
+        <line x1="0" y1="96" x2="200" y2="96" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="111" fill="#1a3a5e">+ processTradeIn() : TradeIn</text>
+        <text x="8" y="126" fill="#1a3a5e">+ updateInventory() : void</text>
+        <text x="8" y="141" fill="#1a3a5e">+ generateReport() : Report</text>
+      </g>
+
+      <!-- ── Manager ── -->
+      <g transform="translate(650,230)">
+        <rect width="200" height="140" rx="6" fill="#dbeeff" stroke="#4a90d9" stroke-width="2"/>
+        <rect width="200" height="28" rx="6" fill="#4a90d9"/>
+        <rect y="22" width="200" height="6" fill="#4a90d9"/>
+        <text x="100" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Manager</text>
+        <line x1="0" y1="58" x2="200" y2="58" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="73" fill="#1a3a5e">- department : String</text>
+        <line x1="0" y1="81" x2="200" y2="81" stroke="#4a90d9" stroke-width="1"/>
+        <text x="8" y="96" fill="#1a3a5e">+ manageStaff() : void</text>
+        <text x="8" y="111" fill="#1a3a5e">+ approveTradeIn() : void</text>
+        <text x="8" y="126" fill="#1a3a5e">+ setPromotion() : Promo</text>
+      </g>
+
+      <!-- Inheritance arrows User → Customer/Clerk/Manager -->
+      <line x1="480" y1="165" x2="185" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#inh)" stroke-dasharray="none"/>
+      <line x1="480" y1="165" x2="480" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#inh)"/>
+      <line x1="480" y1="165" x2="750" y2="230" stroke="#555" stroke-width="1.5" marker-end="url(#inh)"/>
+
+      <!-- ── Product ── -->
+      <g transform="translate(80,500)">
+        <rect width="210" height="190" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+        <rect width="210" height="28" rx="6" fill="#27ae60"/>
+        <rect y="22" width="210" height="6" fill="#27ae60"/>
+        <text x="105" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Product</text>
+        <line x1="0" y1="58" x2="210" y2="58" stroke="#27ae60" stroke-width="1"/>
+        <text x="8" y="73" fill="#145a32">- productId : int (PK)</text>
+        <text x="8" y="88" fill="#145a32">- sku : String</text>
+        <text x="8" y="103" fill="#145a32">- title : String</text>
+        <text x="8" y="118" fill="#145a32">- platform : String</text>
+        <text x="8" y="133" fill="#145a32">- esrbRating : Enum</text>
+        <text x="8" y="148" fill="#145a32">- price : BigDecimal</text>
+        <text x="8" y="163" fill="#145a32">- stockQty : int</text>
+        <text x="8" y="178" fill="#145a32">- isPreorder : boolean</text>
+      </g>
+
+      <!-- ── Cart ── -->
+      <g transform="translate(380,480)">
+        <rect width="200" height="155" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="200" height="28" rx="6" fill="#e67e22"/>
+        <rect y="22" width="200" height="6" fill="#e67e22"/>
+        <text x="100" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Cart</text>
+        <line x1="0" y1="58" x2="200" y2="58" stroke="#e67e22" stroke-width="1"/>
+        <text x="8" y="73" fill="#935116">- cartId : int (PK)</text>
+        <text x="8" y="88" fill="#935116">- createdAt : DateTime</text>
+        <text x="8" y="103" fill="#935116">- subtotal : BigDecimal</text>
+        <text x="8" y="118" fill="#935116">- tax : BigDecimal</text>
+        <text x="8" y="133" fill="#935116">- total : BigDecimal</text>
+        <line x1="0" y1="141" x2="200" y2="141" stroke="#e67e22" stroke-width="1"/>
+        <text x="8" y="156" fill="#935116">+ addItem() : void</text>
+      </g>
+
+      <!-- ── Order ── -->
+      <g transform="translate(650,480)">
+        <rect width="210" height="175" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="210" height="28" rx="6" fill="#e67e22"/>
+        <rect y="22" width="210" height="6" fill="#e67e22"/>
+        <text x="105" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">Order</text>
+        <line x1="0" y1="58" x2="210" y2="58" stroke="#e67e22" stroke-width="1"/>
+        <text x="8" y="73" fill="#935116">- orderId : int (PK)</text>
+        <text x="8" y="88" fill="#935116">- status : Enum</text>
+        <text x="8" y="103" fill="#935116">- totalAmount : BigDecimal</text>
+        <text x="8" y="118" fill="#935116">- orderDate : DateTime</text>
+        <text x="8" y="133" fill="#935116">- trackingCode : String</text>
+        <line x1="0" y1="141" x2="210" y2="141" stroke="#e67e22" stroke-width="1"/>
+        <text x="8" y="156" fill="#935116">+ calculateTotal() : BigDecimal</text>
+        <text x="8" y="171" fill="#935116">+ cancelOrder() : void</text>
+      </g>
+
+      <!-- ── TradeIn ── -->
+      <g transform="translate(900,480)">
+        <rect width="190" height="175" rx="6" fill="#e8daef" stroke="#8e44ad" stroke-width="2"/>
+        <rect width="190" height="28" rx="6" fill="#8e44ad"/>
+        <rect y="22" width="190" height="6" fill="#8e44ad"/>
+        <text x="95" y="20" text-anchor="middle" font-size="12" font-weight="700" fill="#fff">TradeIn</text>
+        <line x1="0" y1="58" x2="190" y2="58" stroke="#8e44ad" stroke-width="1"/>
+        <text x="8" y="73" fill="#5b2c6f">- tradeId : int (PK)</text>
+        <text x="8" y="88" fill="#5b2c6f">- condition : Enum</text>
+        <text x="8" y="103" fill="#5b2c6f">- conditionFactor : float</text>
+        <text x="8" y="118" fill="#5b2c6f">- estimatedCredit : BigDecimal</text>
+        <text x="8" y="133" fill="#5b2c6f">- clerkId : int (FK)</text>
+        <line x1="0" y1="141" x2="190" y2="141" stroke="#8e44ad" stroke-width="1"/>
+        <text x="8" y="156" fill="#5b2c6f">+ calcCredit() : BigDecimal</text>
+        <text x="8" y="171" fill="#5b2c6f">+ approve() : void</text>
+      </g>
+
+      <!-- Customer → Cart (association) -->
+      <line x1="185" y1="405" x2="385" y2="480" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="240" y="445" font-size="10" fill="#e67e22">1 creates 0..*</text>
+
+      <!-- Cart → Order -->
+      <line x1="580" y1="530" x2="650" y2="530" stroke="#e67e22" stroke-width="1.5" marker-end="url(#assoc)"/>
+      <text x="590" y="522" font-size="10" fill="#e67e22">→ Order</text>
+
+      <!-- Clerk → TradeIn -->
+      <line x1="580" y1="335" x2="955" y2="480" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="6,3"/>
+      <text x="740" y="400" font-size="10" fill="#8e44ad">processes</text>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 3 — SEQUENCE
+════════════════════════════════════════════════════════ -->
+<div id="tab-seq" class="tab-panel">
+  <div class="diagram-card">
+    <h2>Sequence Diagrams</h2>
+    <div class="seq-badges">
+      <button class="seq-badge active" onclick="showSeq(0,this)">🛒 Purchase Checkout</button>
+      <button class="seq-badge" onclick="showSeq(1,this)">🔒 Account Lockout</button>
+      <button class="seq-badge" onclick="showSeq(2,this)">♻️ Trade-in Valuation</button>
+    </div>
+
+    <!-- SEQ 0 — PURCHASE -->
+    <div id="seq0">
+    <svg viewBox="0 0 950 520" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Exo 2',sans-serif;font-size:11px">
+      <defs>
+        <marker id="sa" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#333"/></marker>
+        <marker id="sr" markerWidth="8" markerHeight="8" refX="1" refY="3" orient="auto"><path d="M8,0 L8,6 L0,3 z" fill="#c8102e"/></marker>
+      </defs>
+      <!-- actors -->
+      <rect x="60" y="10" width="110" height="30" rx="5" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="115" y="30" text-anchor="middle" font-weight="700" fill="#fff">Customer</text>
+      <rect x="235" y="10" width="110" height="30" rx="5" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="290" y="30" text-anchor="middle" font-weight="700" fill="#fff">Web App</text>
+      <rect x="405" y="10" width="110" height="30" rx="5" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="460" y="30" text-anchor="middle" font-weight="700" fill="#fff">Order Svc</text>
+      <rect x="575" y="10" width="110" height="30" rx="5" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="630" y="30" text-anchor="middle" font-weight="700" fill="#fff">Inventory</text>
+      <rect x="745" y="10" width="110" height="30" rx="5" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="800" y="30" text-anchor="middle" font-weight="700" fill="#fff">Payment Svc</text>
+      <!-- lifelines -->
+      <line x1="115" y1="40" x2="115" y2="510" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="290" y1="40" x2="290" y2="510" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="460" y1="40" x2="460" y2="510" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="630" y1="40" x2="630" y2="510" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="800" y1="40" x2="800" y2="510" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+      <!-- messages -->
+      <line x1="115" y1="80" x2="282" y2="80" stroke="#333" stroke-width="1.5" marker-end="url(#sa)"/>
+      <text x="190" y="74" text-anchor="middle" font-size="10" fill="#333">addToCart(productId, qty)</text>
+
+      <line x1="290" y1="110" x2="452" y2="110" stroke="#333" stroke-width="1.5" marker-end="url(#sa)"/>
+      <text x="370" y="104" text-anchor="middle" font-size="10" fill="#333">validateCart(items[])</text>
+
+      <line x1="460" y1="140" x2="622" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#sa)"/>
+      <text x="540" y="134" text-anchor="middle" font-size="10" fill="#333">checkStock(sku[])</text>
+
+      <line x1="630" y1="170" x2="468" y2="170" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr)"/>
+      <text x="545" y="164" text-anchor="middle" font-size="10" fill="#c8102e">stockStatus: OK</text>
+
+      <line x1="460" y1="200" x2="622" y2="200" stroke="#333" stroke-width="1.5" marker-end="url(#sa)"/>
+      <text x="540" y="194" text-anchor="middle" font-size="10" fill="#333">lockStock(sku[], qty[])</text>
+
+      <rect x="445" y="205" width="20" height="50" rx="2" fill="#c8ffc8" stroke="#27ae60"/>
+      <text x="540" y="220" text-anchor="middle" font-size="9" fill="#1a7a40">Re-validate price</text>
+      <text x="540" y="235" text-anchor="middle" font-size="9" fill="#1a7a40">Apply promo codes</text>
+
+      <line x1="460" y1="270" x2="792" y2="270" stroke="#333" stroke-width="1.5" marker-end="url(#sa)"/>
+      <text x="620" y="264" text-anchor="middle" font-size="10" fill="#333">processPayment(amount, token)</text>
+
+      <rect x="785" y="275" width="20" height="60" rx="2" fill="#ffe0b2" stroke="#e67e22"/>
+      <text x="800" y="295" text-anchor="middle" font-size="9" fill="#935116">AES-256</text>
+      <text x="800" y="310" text-anchor="middle" font-size="9" fill="#935116">PCI-DSS</text>
+
+      <line x1="800" y1="350" x2="468" y2="350" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr)"/>
+      <text x="630" y="344" text-anchor="middle" font-size="10" fill="#c8102e">PAYMENT_CONFIRMED</text>
+
+      <line x1="460" y1="380" x2="298" y2="380" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr)"/>
+      <text x="375" y="374" text-anchor="middle" font-size="10" fill="#c8102e">orderCreated(orderId)</text>
+
+      <line x1="290" y1="410" x2="123" y2="410" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr)"/>
+      <text x="200" y="404" text-anchor="middle" font-size="10" fill="#c8102e">confirmationEmail + receipt</text>
+
+      <!-- alt box -->
+      <rect x="440" y="195" width="370" height="105" rx="4" fill="none" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="8,3"/>
+      <rect x="440" y="195" width="70" height="16" rx="2" fill="#27ae60"/>
+      <text x="445" y="207" font-size="9" fill="#fff" font-weight="700">ACID TXN</text>
+    </svg>
+    </div>
+
+    <!-- SEQ 1 — LOCKOUT -->
+    <div id="seq1" style="display:none">
+    <svg viewBox="0 0 800 480" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Exo 2',sans-serif;font-size:11px">
+      <defs>
+        <marker id="sa2" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#333"/></marker>
+        <marker id="sr2" markerWidth="8" markerHeight="8" refX="1" refY="3" orient="auto"><path d="M8,0 L8,6 L0,3 z" fill="#c8102e"/></marker>
+      </defs>
+      <rect x="60" y="10" width="110" height="30" rx="5" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="115" y="30" text-anchor="middle" font-weight="700" fill="#fff">Customer</text>
+      <rect x="230" y="10" width="110" height="30" rx="5" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="285" y="30" text-anchor="middle" font-weight="700" fill="#fff">Auth Service</text>
+      <rect x="400" y="10" width="110" height="30" rx="5" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="455" y="30" text-anchor="middle" font-weight="700" fill="#fff">Database</text>
+      <rect x="570" y="10" width="110" height="30" rx="5" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="625" y="30" text-anchor="middle" font-weight="700" fill="#fff">Email Service</text>
+
+      <line x1="115" y1="40" x2="115" y2="470" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="285" y1="40" x2="285" y2="470" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="455" y1="40" x2="455" y2="470" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="625" y1="40" x2="625" y2="470" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+      <text x="130" y="68" font-size="10" fill="#c8102e" font-weight="700">Attempt 1 of 3</text>
+      <line x1="115" y1="75" x2="277" y2="75" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="195" y="69" text-anchor="middle" font-size="10" fill="#333">login(user, wrongPwd)</text>
+      <line x1="285" y1="100" x2="447" y2="100" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="365" y="94" text-anchor="middle" font-size="10" fill="#333">getUser(email)</text>
+      <line x1="455" y1="125" x2="293" y2="125" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr2)"/>
+      <text x="365" y="119" text-anchor="middle" font-size="10" fill="#c8102e">user record</text>
+      <line x1="285" y1="150" x2="447" y2="150" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="365" y="144" text-anchor="middle" font-size="10" fill="#333">increment failedAttempts</text>
+      <line x1="285" y1="175" x2="123" y2="175" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr2)"/>
+      <text x="200" y="169" text-anchor="middle" font-size="10" fill="#c8102e">INVALID_CREDENTIALS (1/3)</text>
+
+      <text x="130" y="205" font-size="10" fill="#c8102e" font-weight="700">Attempt 3 — Lockout triggered</text>
+      <line x1="115" y1="215" x2="277" y2="215" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="195" y="209" text-anchor="middle" font-size="10" fill="#333">login(user, wrongPwd)</text>
+      <line x1="285" y1="240" x2="447" y2="240" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="365" y="234" text-anchor="middle" font-size="10" fill="#333">failedAttempts = 3 → setLocked(30min)</text>
+      <line x1="285" y1="265" x2="617" y2="265" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="450" y="259" text-anchor="middle" font-size="10" fill="#333">sendLockoutEmail(user.email)</text>
+      <line x1="285" y1="295" x2="123" y2="295" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr2)"/>
+      <text x="200" y="289" text-anchor="middle" font-size="10" fill="#c8102e">ACCOUNT_LOCKED (30 min)</text>
+
+      <!-- lockout box -->
+      <rect x="100" y="310" width="500" height="60" rx="6" fill="#fdecea" stroke="#c8102e" stroke-width="2"/>
+      <text x="350" y="335" text-anchor="middle" font-size="11" font-weight="700" fill="#c8102e">🔒 Account Locked for 30 Minutes</text>
+      <text x="350" y="355" text-anchor="middle" font-size="10" fill="#7b241c">All further login attempts blocked · lockedUntil timestamp stored in DB</text>
+
+      <line x1="285" y1="385" x2="447" y2="385" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="365" y="379" text-anchor="middle" font-size="10" fill="#333">checkLockoutExpiry() [after 30 min]</text>
+      <line x1="285" y1="410" x2="447" y2="410" stroke="#333" stroke-width="1.5" marker-end="url(#sa2)"/>
+      <text x="365" y="404" text-anchor="middle" font-size="10" fill="#333">resetFailedAttempts()</text>
+      <line x1="285" y1="440" x2="123" y2="440" stroke="#c8102e" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr2)"/>
+      <text x="200" y="434" text-anchor="middle" font-size="10" fill="#c8102e">ACCOUNT_UNLOCKED</text>
+    </svg>
+    </div>
+
+    <!-- SEQ 2 — TRADE-IN -->
+    <div id="seq2" style="display:none">
+    <svg viewBox="0 0 850 460" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Exo 2',sans-serif;font-size:11px">
+      <defs>
+        <marker id="sa3" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#333"/></marker>
+        <marker id="sr3" markerWidth="8" markerHeight="8" refX="1" refY="3" orient="auto"><path d="M8,0 L8,6 L0,3 z" fill="#8e44ad"/></marker>
+      </defs>
+      <rect x="40" y="10" width="110" height="30" rx="5" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="95" y="30" text-anchor="middle" font-weight="700" fill="#fff">Customer</text>
+      <rect x="200" y="10" width="110" height="30" rx="5" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="255" y="30" text-anchor="middle" font-weight="700" fill="#fff">Clerk</text>
+      <rect x="360" y="10" width="120" height="30" rx="5" fill="#8e44ad" stroke="#5b2c6f" stroke-width="1.5"/>
+      <text x="420" y="30" text-anchor="middle" font-weight="700" fill="#fff">TradeIn Engine</text>
+      <rect x="540" y="10" width="110" height="30" rx="5" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="595" y="30" text-anchor="middle" font-weight="700" fill="#fff">Database</text>
+      <rect x="710" y="10" width="110" height="30" rx="5" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="765" y="30" text-anchor="middle" font-weight="700" fill="#fff">Wallet Svc</text>
+
+      <line x1="95" y1="40" x2="95" y2="450" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="255" y1="40" x2="255" y2="450" stroke="#27ae60" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="420" y1="40" x2="420" y2="450" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="595" y1="40" x2="595" y2="450" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,4"/>
+      <line x1="765" y1="40" x2="765" y2="450" stroke="#e67e22" stroke-width="1.5" stroke-dasharray="6,4"/>
+
+      <line x1="95" y1="80" x2="247" y2="80" stroke="#333" stroke-width="1.5" marker-end="url(#sa3)"/>
+      <text x="170" y="74" text-anchor="middle" font-size="10" fill="#333">bringGameForTrade(product)</text>
+      <line x1="255" y1="110" x2="412" y2="110" stroke="#333" stroke-width="1.5" marker-end="url(#sa3)"/>
+      <text x="333" y="104" text-anchor="middle" font-size="10" fill="#333">initiateTradeIn(product, condition)</text>
+      <line x1="420" y1="140" x2="587" y2="140" stroke="#333" stroke-width="1.5" marker-end="url(#sa3)"/>
+      <text x="503" y="134" text-anchor="middle" font-size="10" fill="#333">lookupBaseValue(sku)</text>
+      <line x1="595" y1="165" x2="428" y2="165" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr3)"/>
+      <text x="510" y="159" text-anchor="middle" font-size="10" fill="#8e44ad">baseValue: $25.00</text>
+
+      <!-- calc box -->
+      <rect x="360" y="175" width="170" height="80" rx="5" fill="#e8daef" stroke="#8e44ad" stroke-width="1.5"/>
+      <text x="445" y="193" text-anchor="middle" font-size="10" font-weight="700" fill="#5b2c6f">Condition Factor Calc</text>
+      <text x="445" y="210" text-anchor="middle" font-size="10" fill="#5b2c6f">New: 1.0 × $25 = $25.00</text>
+      <text x="445" y="225" text-anchor="middle" font-size="10" fill="#5b2c6f">Good: 0.7 × $25 = $17.50</text>
+      <text x="445" y="240" text-anchor="middle" font-size="10" fill="#5b2c6f">Fair: 0.5 × $25 = $12.50</text>
+      <text x="445" y="255" text-anchor="middle" font-size="10" fill="#5b2c6f">Poor: 0.3 × $25 = $7.50</text>
+
+      <line x1="420" y1="265" x2="247" y2="265" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr3)"/>
+      <text x="333" y="259" text-anchor="middle" font-size="10" fill="#8e44ad">creditOffer: $17.50 (Good)</text>
+      <line x1="255" y1="295" x2="103" y2="295" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr3)"/>
+      <text x="175" y="289" text-anchor="middle" font-size="10" fill="#8e44ad">showOffer($17.50)</text>
+      <line x1="95" y1="325" x2="247" y2="325" stroke="#333" stroke-width="1.5" marker-end="url(#sa3)"/>
+      <text x="170" y="319" text-anchor="middle" font-size="10" fill="#333">acceptOffer()</text>
+      <line x1="255" y1="355" x2="587" y2="355" stroke="#333" stroke-width="1.5" marker-end="url(#sa3)"/>
+      <text x="420" y="349" text-anchor="middle" font-size="10" fill="#333">saveTradeIn() + creditWallet($17.50)</text>
+      <line x1="595" y1="380" x2="757" y2="380" stroke="#333" stroke-width="1.5" marker-end="url(#sa3)"/>
+      <text x="675" y="374" text-anchor="middle" font-size="10" fill="#333">addBalance(customerId, $17.50)</text>
+      <line x1="255" y1="410" x2="103" y2="410" stroke="#8e44ad" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#sr3)"/>
+      <text x="175" y="404" text-anchor="middle" font-size="10" fill="#8e44ad">TRADE_IN_COMPLETE · receipt</text>
+    </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 4 — ACTIVITY
+════════════════════════════════════════════════════════ -->
+<div id="tab-act" class="tab-panel">
+  <div class="diagram-card">
+    <h2>Activity Diagram — Purchase Flow (Swimlanes)</h2>
+    <svg viewBox="0 0 950 900" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Exo 2',sans-serif;font-size:11px">
+      <defs>
+        <marker id="act-arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#333"/>
+        </marker>
+      </defs>
+      <!-- Lane headers -->
+      <rect x="10" y="10" width="290" height="40" rx="5" fill="#4a90d9"/>
+      <text x="155" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Customer</text>
+      <rect x="310" y="10" width="290" height="40" rx="5" fill="#27ae60"/>
+      <text x="455" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">System</text>
+      <rect x="610" y="10" width="320" height="40" rx="5" fill="#e67e22"/>
+      <text x="770" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="#fff">Database</text>
+
+      <!-- Lane backgrounds -->
+      <rect x="10" y="50" width="290" height="840" rx="0" fill="#eaf2ff" stroke="#4a90d9" stroke-width="1"/>
+      <rect x="310" y="50" width="290" height="840" rx="0" fill="#eafaf1" stroke="#27ae60" stroke-width="1"/>
+      <rect x="610" y="50" width="320" height="840" rx="0" fill="#fef9f0" stroke="#e67e22" stroke-width="1"/>
+
+      <!-- START -->
+      <circle cx="155" cy="90" r="14" fill="#1a1a2e"/>
+      <line x1="155" y1="104" x2="155" y2="130" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- BROWSE -->
+      <rect x="55" y="130" width="200" height="38" rx="19" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="155" y="154" text-anchor="middle" font-weight="700" fill="#fff">Browse Catalog</text>
+      <line x1="155" y1="168" x2="155" y2="198" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- ADD TO CART -->
+      <rect x="55" y="198" width="200" height="38" rx="19" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="155" y="222" text-anchor="middle" font-weight="700" fill="#fff">Add to Cart</text>
+      <line x1="255" y1="217" x2="310" y2="217" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- CHECK STOCK -->
+      <rect x="335" y="198" width="200" height="38" rx="19" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="435" y="222" text-anchor="middle" font-weight="700" fill="#fff">Check Stock</text>
+      <line x1="510" y1="217" x2="610" y2="217" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- STOCK QUERY -->
+      <rect x="640" y="198" width="250" height="38" rx="19" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="765" y="222" text-anchor="middle" font-weight="700" fill="#fff">Query Inventory Table</text>
+      <line x1="765" y1="236" x2="765" y2="275" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- STOCK DECISION -->
+      <polygon points="765,275 840,315 765,355 690,315" fill="#fff8e1" stroke="#f39c12" stroke-width="2"/>
+      <text x="765" y="310" text-anchor="middle" font-size="11" font-weight="700" fill="#7d5a00">In Stock?</text>
+      <text x="765" y="325" text-anchor="middle" font-size="10" fill="#7d5a00">qty &gt; 0</text>
+      <!-- Yes → back -->
+      <line x1="690" y1="315" x2="435" y2="315" stroke="#27ae60" stroke-width="1.5" marker-end="url(#act-arr)"/>
+      <text x="570" y="308" text-anchor="middle" font-size="10" fill="#27ae60">Yes</text>
+      <!-- No -->
+      <line x1="765" y1="355" x2="765" y2="390" stroke="#c8102e" stroke-width="1.5" marker-end="url(#act-arr)"/>
+      <text x="780" y="378" font-size="10" fill="#c8102e">No</text>
+      <rect x="640" y="390" width="250" height="35" rx="17" fill="#fdecea" stroke="#c8102e" stroke-width="1.5"/>
+      <text x="765" y="412" text-anchor="middle" font-size="10" font-weight="700" fill="#c8102e">Notify: Out of Stock</text>
+
+      <!-- ESRB CHECK -->
+      <rect x="335" y="295" width="200" height="38" rx="19" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="435" y="319" text-anchor="middle" font-weight="700" fill="#fff">ESRB Rating Check</text>
+      <line x1="435" y1="333" x2="435" y2="365" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- AGE DECISION -->
+      <polygon points="435,365 510,400 435,435 360,400" fill="#fff8e1" stroke="#f39c12" stroke-width="2"/>
+      <text x="435" y="394" text-anchor="middle" font-size="11" font-weight="700" fill="#7d5a00">Rated M?</text>
+      <text x="435" y="409" text-anchor="middle" font-size="10" fill="#7d5a00">+ Age &lt; 18?</text>
+      <!-- No -->
+      <line x1="435" y1="435" x2="435" y2="465" stroke="#27ae60" stroke-width="1.5" marker-end="url(#act-arr)"/>
+      <text x="448" y="455" font-size="10" fill="#27ae60">No</text>
+      <!-- Yes -->
+      <line x1="360" y1="400" x2="155" y2="400" stroke="#c8102e" stroke-width="1.5" marker-end="url(#act-arr)"/>
+      <text x="260" y="393" text-anchor="middle" font-size="10" fill="#c8102e">Yes (minor)</text>
+      <rect x="50" y="390" width="210" height="35" rx="17" fill="#fdecea" stroke="#c8102e" stroke-width="1.5"/>
+      <text x="155" y="412" text-anchor="middle" font-size="10" font-weight="700" fill="#c8102e">🔞 Purchase Blocked</text>
+
+      <!-- CHECKOUT -->
+      <rect x="335" y="465" width="200" height="38" rx="19" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="435" y="489" text-anchor="middle" font-weight="700" fill="#fff">Proceed to Checkout</text>
+      <line x1="310" y1="484" x2="255" y2="484" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- ENTER PAYMENT -->
+      <rect x="55" y="465" width="200" height="38" rx="19" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="155" y="489" text-anchor="middle" font-weight="700" fill="#fff">Enter Payment Info</text>
+      <line x1="255" y1="484" x2="310" y2="520" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- PROCESS PAYMENT -->
+      <rect x="335" y="520" width="200" height="38" rx="19" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="435" y="544" text-anchor="middle" font-weight="700" fill="#fff">Process Payment</text>
+      <line x1="510" y1="539" x2="610" y2="539" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- STORE TXN -->
+      <rect x="640" y="520" width="250" height="38" rx="19" fill="#e67e22" stroke="#935116" stroke-width="1.5"/>
+      <text x="765" y="544" text-anchor="middle" font-weight="700" fill="#fff">Store Transaction (ACID)</text>
+      <line x1="765" y1="558" x2="765" y2="593" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- PAYMENT DECISION -->
+      <polygon points="765,593 840,628 765,663 690,628" fill="#fff8e1" stroke="#f39c12" stroke-width="2"/>
+      <text x="765" y="622" text-anchor="middle" font-size="11" font-weight="700" fill="#7d5a00">Payment</text>
+      <text x="765" y="637" text-anchor="middle" font-size="10" fill="#7d5a00">Approved?</text>
+      <!-- Yes -->
+      <line x1="690" y1="628" x2="535" y2="628" stroke="#27ae60" stroke-width="1.5" marker-end="url(#act-arr)"/>
+      <text x="618" y="621" text-anchor="middle" font-size="10" fill="#27ae60">Yes</text>
+      <!-- No -->
+      <line x1="765" y1="663" x2="765" y2="700" stroke="#c8102e" stroke-width="1.5" marker-end="url(#act-arr)"/>
+      <text x="780" y="685" font-size="10" fill="#c8102e">No</text>
+      <rect x="640" y="700" width="250" height="35" rx="17" fill="#fdecea" stroke="#c8102e" stroke-width="1.5"/>
+      <text x="765" y="722" text-anchor="middle" font-size="10" font-weight="700" fill="#c8102e">Payment Failed — Retry</text>
+
+      <!-- CREATE ORDER -->
+      <rect x="335" y="608" width="200" height="38" rx="19" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="435" y="632" text-anchor="middle" font-weight="700" fill="#fff">Create Order Record</text>
+      <line x1="435" y1="646" x2="435" y2="680" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- SEND CONFIRM -->
+      <rect x="335" y="680" width="200" height="38" rx="19" fill="#27ae60" stroke="#145a32" stroke-width="1.5"/>
+      <text x="435" y="704" text-anchor="middle" font-weight="700" fill="#fff">Send Confirmation</text>
+      <line x1="310" y1="699" x2="255" y2="720" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- VIEW RECEIPT -->
+      <rect x="55" y="720" width="200" height="38" rx="19" fill="#4a90d9" stroke="#1a5fa8" stroke-width="1.5"/>
+      <text x="155" y="744" text-anchor="middle" font-weight="700" fill="#fff">View Receipt / Track</text>
+      <line x1="155" y1="758" x2="155" y2="800" stroke="#333" stroke-width="1.5" marker-end="url(#act-arr)"/>
+
+      <!-- END -->
+      <circle cx="155" cy="820" r="14" fill="#fff" stroke="#1a1a2e" stroke-width="2"/>
+      <circle cx="155" cy="820" r="9" fill="#1a1a2e"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 5 — DATABASE ERD
+════════════════════════════════════════════════════════ -->
+<div id="tab-db" class="tab-panel">
+  <div class="diagram-card">
+    <h2>Entity-Relationship Diagram (ERD)</h2>
+    <svg viewBox="0 0 1100 900" width="100%" xmlns="http://www.w3.org/2000/svg" style="font-family:'Share Tech Mono','Courier New',monospace;font-size:10px">
+      <defs>
+        <marker id="fk" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#888"/>
+        </marker>
+      </defs>
+
+      <!-- USERS -->
+      <g transform="translate(10,10)">
+        <rect width="195" height="230" rx="6" fill="#dbeeff" stroke="#4a90d9" stroke-width="2"/>
+        <rect width="195" height="26" rx="6" fill="#4a90d9"/>
+        <rect y="20" width="195" height="6" fill="#4a90d9"/>
+        <text x="97" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">USERS</text>
+        <text x="8" y="48" fill="#1a3a5e">🔑 user_id INT PK</text>
+        <text x="8" y="63" fill="#1a3a5e">  username VARCHAR(50)</text>
+        <text x="8" y="78" fill="#1a3a5e">  email VARCHAR(100)</text>
+        <text x="8" y="93" fill="#1a3a5e">  password_hash VARCHAR</text>
+        <text x="8" y="108" fill="#1a3a5e">  role ENUM</text>
+        <text x="8" y="123" fill="#1a3a5e">  dob DATE</text>
+        <text x="8" y="138" fill="#1a3a5e">  failed_attempts INT</text>
+        <text x="8" y="153" fill="#1a3a5e">  locked_until DATETIME</text>
+        <text x="8" y="168" fill="#1a3a5e">  mfa_enabled BOOL</text>
+        <text x="8" y="183" fill="#1a3a5e">  created_at DATETIME</text>
+        <text x="8" y="198" fill="#1a3a5e">  updated_at DATETIME</text>
+      </g>
+
+      <!-- PRODUCTS -->
+      <g transform="translate(240,10)">
+        <rect width="210" height="230" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+        <rect width="210" height="26" rx="6" fill="#27ae60"/>
+        <rect y="20" width="210" height="6" fill="#27ae60"/>
+        <text x="105" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">PRODUCTS</text>
+        <text x="8" y="48" fill="#145a32">🔑 product_id INT PK</text>
+        <text x="8" y="63" fill="#145a32">  sku VARCHAR(50)</text>
+        <text x="8" y="78" fill="#145a32">  title VARCHAR(200)</text>
+        <text x="8" y="93" fill="#145a32">  platform VARCHAR(50)</text>
+        <text x="8" y="108" fill="#145a32">  genre VARCHAR(50)</text>
+        <text x="8" y="123" fill="#145a32">  esrb_rating ENUM</text>
+        <text x="8" y="138" fill="#145a32">  price DECIMAL(10,2)</text>
+        <text x="8" y="153" fill="#145a32">  stock_qty INT</text>
+        <text x="8" y="168" fill="#145a32">  is_preorder BOOL</text>
+        <text x="8" y="183" fill="#145a32">  supplier_id INT FK</text>
+        <text x="8" y="198" fill="#145a32">  created_at DATETIME</text>
+      </g>
+
+      <!-- CARTS -->
+      <g transform="translate(490,10)">
+        <rect width="195" height="160" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="195" height="26" rx="6" fill="#e67e22"/>
+        <rect y="20" width="195" height="6" fill="#e67e22"/>
+        <text x="97" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">CARTS</text>
+        <text x="8" y="48" fill="#935116">🔑 cart_id INT PK</text>
+        <text x="8" y="63" fill="#935116">🔗 user_id INT FK</text>
+        <text x="8" y="78" fill="#935116">  subtotal DECIMAL(10,2)</text>
+        <text x="8" y="93" fill="#935116">  tax DECIMAL(10,2)</text>
+        <text x="8" y="108" fill="#935116">  total DECIMAL(10,2)</text>
+        <text x="8" y="123" fill="#935116">  status ENUM</text>
+        <text x="8" y="138" fill="#935116">  created_at DATETIME</text>
+      </g>
+
+      <!-- CART_ITEMS -->
+      <g transform="translate(720,10)">
+        <rect width="200" height="145" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="200" height="26" rx="6" fill="#e67e22"/>
+        <rect y="20" width="200" height="6" fill="#e67e22"/>
+        <text x="100" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">CART_ITEMS</text>
+        <text x="8" y="48" fill="#935116">🔑 item_id INT PK</text>
+        <text x="8" y="63" fill="#935116">🔗 cart_id INT FK</text>
+        <text x="8" y="78" fill="#935116">🔗 product_id INT FK</text>
+        <text x="8" y="93" fill="#935116">  quantity INT</text>
+        <text x="8" y="108" fill="#935116">  unit_price DECIMAL</text>
+        <text x="8" y="123" fill="#935116">  discount_applied DEC</text>
+      </g>
+
+      <!-- ORDERS -->
+      <g transform="translate(10,310)">
+        <rect width="210" height="195" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="210" height="26" rx="6" fill="#e67e22"/>
+        <rect y="20" width="210" height="6" fill="#e67e22"/>
+        <text x="105" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">ORDERS</text>
+        <text x="8" y="48" fill="#935116">🔑 order_id INT PK</text>
+        <text x="8" y="63" fill="#935116">🔗 user_id INT FK</text>
+        <text x="8" y="78" fill="#935116">🔗 cart_id INT FK</text>
+        <text x="8" y="93" fill="#935116">  status ENUM</text>
+        <text x="8" y="108" fill="#935116">  total_amount DEC(10,2)</text>
+        <text x="8" y="123" fill="#935116">  order_date DATETIME</text>
+        <text x="8" y="138" fill="#935116">  tracking_code VARCHAR</text>
+        <text x="8" y="153" fill="#935116">  shipping_opt_id INT FK</text>
+        <text x="8" y="168" fill="#935116">  promo_id INT FK</text>
+      </g>
+
+      <!-- PAYMENTS -->
+      <g transform="translate(260,310)">
+        <rect width="200" height="165" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="200" height="26" rx="6" fill="#c0392b"/>
+        <rect y="20" width="200" height="6" fill="#c0392b"/>
+        <text x="100" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">PAYMENTS</text>
+        <text x="8" y="48" fill="#7b241c">🔑 payment_id INT PK</text>
+        <text x="8" y="63" fill="#7b241c">🔗 order_id INT FK</text>
+        <text x="8" y="78" fill="#7b241c">  method ENUM</text>
+        <text x="8" y="93" fill="#7b241c">  amount DEC(10,2)</text>
+        <text x="8" y="108" fill="#7b241c">  status ENUM</text>
+        <text x="8" y="123" fill="#7b241c">  card_ref_enc VARCHAR</text>
+        <text x="8" y="138" fill="#7b241c">  transaction_id VARCHAR</text>
+        <text x="8" y="153" fill="#7b241c">  processed_at DATETIME</text>
+      </g>
+
+      <!-- PROMOTIONS -->
+      <g transform="translate(500,310)">
+        <rect width="195" height="165" rx="6" fill="#e8daef" stroke="#8e44ad" stroke-width="2"/>
+        <rect width="195" height="26" rx="6" fill="#8e44ad"/>
+        <rect y="20" width="195" height="6" fill="#8e44ad"/>
+        <text x="97" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">PROMOTIONS</text>
+        <text x="8" y="48" fill="#5b2c6f">🔑 promo_id INT PK</text>
+        <text x="8" y="63" fill="#5b2c6f">  code VARCHAR(20)</text>
+        <text x="8" y="78" fill="#5b2c6f">  discount_pct DEC(5,2)</text>
+        <text x="8" y="93" fill="#5b2c6f">  is_active BOOL</text>
+        <text x="8" y="108" fill="#5b2c6f">  expires_at DATETIME</text>
+        <text x="8" y="123" fill="#5b2c6f">  min_purchase DEC</text>
+        <text x="8" y="138" fill="#5b2c6f">  usage_limit INT</text>
+      </g>
+
+      <!-- TRADE_INS -->
+      <g transform="translate(730,310)">
+        <rect width="210" height="195" rx="6" fill="#e8daef" stroke="#8e44ad" stroke-width="2"/>
+        <rect width="210" height="26" rx="6" fill="#8e44ad"/>
+        <rect y="20" width="210" height="6" fill="#8e44ad"/>
+        <text x="105" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">TRADE_INS</text>
+        <text x="8" y="48" fill="#5b2c6f">🔑 trade_id INT PK</text>
+        <text x="8" y="63" fill="#5b2c6f">🔗 user_id INT FK</text>
+        <text x="8" y="78" fill="#5b2c6f">🔗 product_id INT FK</text>
+        <text x="8" y="93" fill="#5b2c6f">🔗 clerk_id INT FK</text>
+        <text x="8" y="108" fill="#5b2c6f">  condition ENUM</text>
+        <text x="8" y="123" fill="#5b2c6f">  condition_factor DEC</text>
+        <text x="8" y="138" fill="#5b2c6f">  estimated_credit DEC</text>
+        <text x="8" y="153" fill="#5b2c6f">  status ENUM</text>
+        <text x="8" y="168" fill="#5b2c6f">  created_at DATETIME</text>
+      </g>
+
+      <!-- STORE_CREDIT_WALLET -->
+      <g transform="translate(10,590)">
+        <rect width="200" height="120" rx="6" fill="#d5f5e3" stroke="#27ae60" stroke-width="2"/>
+        <rect width="200" height="26" rx="6" fill="#27ae60"/>
+        <rect y="20" width="200" height="6" fill="#27ae60"/>
+        <text x="100" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">STORE_CREDIT_WALLET</text>
+        <text x="8" y="48" fill="#145a32">🔑 wallet_id INT PK</text>
+        <text x="8" y="63" fill="#145a32">🔗 user_id INT FK (unique)</text>
+        <text x="8" y="78" fill="#145a32">  balance DEC(10,2)</text>
+        <text x="8" y="93" fill="#145a32">  updated_at DATETIME</text>
+      </g>
+
+      <!-- SHIPPING_OPTIONS -->
+      <g transform="translate(250,590)">
+        <rect width="200" height="135" rx="6" fill="#fdebd0" stroke="#e67e22" stroke-width="2"/>
+        <rect width="200" height="26" rx="6" fill="#e67e22"/>
+        <rect y="20" width="200" height="6" fill="#e67e22"/>
+        <text x="100" y="18" text-anchor="middle" font-size="11" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">SHIPPING_OPTIONS</text>
+        <text x="8" y="48" fill="#935116">🔑 shipping_id INT PK</text>
+        <text x="8" y="63" fill="#935116">  method VARCHAR(50)</text>
+        <text x="8" y="78" fill="#935116">  carrier VARCHAR(50)</text>
+        <text x="8" y="93" fill="#935116">  cost DEC(6,2)</text>
+        <text x="8" y="108" fill="#935116">  est_days INT</text>
+      </g>
+
+      <!-- AUDIT_LOG -->
+      <g transform="translate(490,590)">
+        <rect width="200" height="150" rx="6" fill="#fdedec" stroke="#c0392b" stroke-width="2"/>
+        <rect width="200" height="26" rx="6" fill="#c0392b"/>
+        <rect y="20" width="200" height="6" fill="#c0392b"/>
+        <text x="100" y="18" text-anchor="middle" font-size="12" font-weight="700" fill="#fff" style="font-family:'Exo 2',sans-serif">AUDIT_LOG</text>
+        <text x="8" y="48" fill="#7b241c">🔑 log_id INT PK</text>
+        <text x="8" y="63" fill="#7b241c">🔗 user_id INT FK</text>
+        <text x="8" y="78" fill="#7b241c">  action VARCHAR(100)</text>
+        <text x="8" y="93" fill="#7b241c">  entity_type VARCHAR</text>
+        <text x="8" y="108" fill="#7b241c">  entity_id INT</text>
+        <text x="8" y="123" fill="#7b241c">  ip_address VARCHAR</text>
+        <text x="8" y="138" fill="#7b241c">  timestamp DATETIME</text>
+      </g>
+
+      <!-- FK LINES -->
+      <!-- USERS → CARTS -->
+      <line x1="205" y1="80" x2="490" y2="80" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <text x="340" y="73" text-anchor="middle" font-size="9" fill="#555">1 — 0..*</text>
+      <!-- CARTS → CART_ITEMS -->
+      <line x1="685" y1="80" x2="720" y2="80" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <text x="700" y="73" font-size="9" fill="#555">1:N</text>
+      <!-- PRODUCTS → CART_ITEMS -->
+      <line x1="380" y1="200" x2="770" y2="83" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <!-- USERS → ORDERS -->
+      <line x1="107" y1="240" x2="107" y2="310" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <text x="115" y="278" font-size="9" fill="#555">1:N</text>
+      <!-- ORDERS → PAYMENTS -->
+      <line x1="220" y1="405" x2="260" y2="405" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <text x="237" y="398" font-size="9" fill="#555">1:1</text>
+      <!-- USERS → TRADE_INS -->
+      <line x1="205" y1="140" x2="730" y2="380" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <!-- USERS → WALLET -->
+      <line x1="107" y1="240" x2="107" y2="590" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <!-- ORDERS → SHIPPING -->
+      <line x1="115" y1="505" x2="310" y2="605" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+      <!-- USERS → AUDIT -->
+      <line x1="205" y1="170" x2="490" y2="645" stroke="#888" stroke-width="1.5" stroke-dasharray="5,3" marker-end="url(#fk)"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════
+     TAB 6 — UI PROTOTYPE
+════════════════════════════════════════════════════════ -->
+<div id="tab-ui" class="tab-panel">
+  <div class="diagram-card">
+    <h2>UI Prototype — 4 Screens</h2>
+    <div class="proto-grid">
+
+      <!-- SCREEN 1: CATALOG -->
+      <div class="proto-screen">
+        <div class="proto-bar">
+          <div class="proto-dots">
+            <div style="background:#ff5f57"></div>
+            <div style="background:#febc2e"></div>
+            <div style="background:#28c840"></div>
+          </div>
+          <span>🛍 Product Catalog</span>
+        </div>
+        <div class="proto-body">
+          <!-- nav -->
+          <div style="background:#c8102e;margin:-16px -16px 12px;padding:8px 12px;display:flex;align-items:center;gap:10px">
+            <span style="color:#fff;font-weight:900;font-size:14px;font-family:'Rajdhani',sans-serif;letter-spacing:1px">GAMESTOP</span>
+            <div style="flex:1;background:#fff;border-radius:4px;padding:4px 8px;font-size:10px;color:#888">🔍 Search games, consoles...</div>
+            <span style="color:#fff;font-size:16px">🛒</span>
+          </div>
+          <!-- filters -->
+          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+            <span style="background:#c8102e;color:#fff;border-radius:12px;padding:3px 10px;font-size:9px;font-weight:700">All</span>
+            <span style="border:1px solid #ccc;border-radius:12px;padding:3px 10px;font-size:9px">PS5</span>
+            <span style="border:1px solid #ccc;border-radius:12px;padding:3px 10px;font-size:9px">Xbox</span>
+            <span style="border:1px solid #ccc;border-radius:12px;padding:3px 10px;font-size:9px">Switch</span>
+            <span style="border:1px solid #ccc;border-radius:12px;padding:3px 10px;font-size:9px">PC</span>
+          </div>
+          <!-- product grid -->
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="border:1px solid #eee;border-radius:8px;overflow:hidden">
+              <div style="background:#2c2c54;height:80px;display:flex;align-items:center;justify-content:center">
+                <span style="font-size:28px">🎮</span>
+              </div>
+              <div style="padding:8px">
+                <div style="font-size:9px;font-weight:700;color:#1a1a2e">Spider-Man 2</div>
+                <div style="display:flex;align-items:center;gap:4px;margin:3px 0">
+                  <span style="background:#c8102e;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px">M 17+</span>
+                  <span style="font-size:8px;color:#888">PS5</span>
+                </div>
+                <div style="font-size:11px;font-weight:900;color:#c8102e">$69.99</div>
+                <button style="width:100%;background:#c8102e;color:#fff;border:none;border-radius:4px;padding:4px;font-size:9px;font-weight:700;margin-top:4px;cursor:pointer">Add to Cart</button>
+              </div>
+            </div>
+            <div style="border:1px solid #eee;border-radius:8px;overflow:hidden">
+              <div style="background:#1a3a1a;height:80px;display:flex;align-items:center;justify-content:center">
+                <span style="font-size:28px">⚔️</span>
+              </div>
+              <div style="padding:8px">
+                <div style="font-size:9px;font-weight:700;color:#1a1a2e">Zelda: TotK</div>
+                <div style="display:flex;align-items:center;gap:4px;margin:3px 0">
+                  <span style="background:#e67e22;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px">E10+</span>
+                  <span style="font-size:8px;color:#888">Switch</span>
+                </div>
+                <div style="font-size:11px;font-weight:900;color:#c8102e">$59.99</div>
+                <button style="width:100%;background:#c8102e;color:#fff;border:none;border-radius:4px;padding:4px;font-size:9px;font-weight:700;margin-top:4px;cursor:pointer">Add to Cart</button>
+              </div>
+            </div>
+            <div style="border:1px solid #eee;border-radius:8px;overflow:hidden">
+              <div style="background:#1a1a54;height:80px;display:flex;align-items:center;justify-content:center">
+                <span style="font-size:28px">🚀</span>
+              </div>
+              <div style="padding:8px">
+                <div style="font-size:9px;font-weight:700;color:#1a1a2e">Starfield</div>
+                <div style="display:flex;align-items:center;gap:4px;margin:3px 0">
+                  <span style="background:#c8102e;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px">M 17+</span>
+                  <span style="font-size:8px;color:#888">Xbox/PC</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:4px">
+                  <span style="font-size:11px;font-weight:900;color:#c8102e">$39.99</span>
+                  <span style="font-size:9px;color:#888;text-decoration:line-through">$69.99</span>
+                </div>
+                <button style="width:100%;background:#c8102e;color:#fff;border:none;border-radius:4px;padding:4px;font-size:9px;font-weight:700;margin-top:4px;cursor:pointer">Add to Cart</button>
+              </div>
+            </div>
+            <div style="border:1px solid #eee;border-radius:8px;overflow:hidden;position:relative">
+              <div style="position:absolute;top:6px;right:6px;background:#27ae60;color:#fff;font-size:7px;font-weight:700;padding:2px 5px;border-radius:3px">PRE-ORDER</div>
+              <div style="background:#3a1a1a;height:80px;display:flex;align-items:center;justify-content:center">
+                <span style="font-size:28px">🔥</span>
+              </div>
+              <div style="padding:8px">
+                <div style="font-size:9px;font-weight:700;color:#1a1a2e">GTA VI</div>
+                <div style="display:flex;align-items:center;gap:4px;margin:3px 0">
+                  <span style="background:#c8102e;color:#fff;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px">M 17+</span>
+                  <span style="font-size:8px;color:#888">PS5/Xbox</span>
+                </div>
+                <div style="font-size:11px;font-weight:900;color:#c8102e">$69.99</div>
+                <button style="width:100%;background:#27ae60;color:#fff;border:none;border-radius:4px;padding:4px;font-size:9px;font-weight:700;margin-top:4px;cursor:pointer">Pre-Order Now</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: CART -->
+      <div class="proto-screen">
+        <div class="proto-bar">
+          <div class="proto-dots">
+            <div style="background:#ff5f57"></div>
+            <div style="background:#febc2e"></div>
+            <div style="background:#28c840"></div>
+          </div>
+          <span>🛒 Shopping Cart</span>
+        </div>
+        <div class="proto-body">
+          <div style="background:#c8102e;margin:-16px -16px 12px;padding:8px 12px">
+            <span style="color:#fff;font-weight:900;font-size:14px;font-family:'Rajdhani',sans-serif">🛒 Your Cart (2 items)</span>
+          </div>
+          <!-- warning -->
+          <div style="background:#fff3cd;border:1px solid #ffc107;border-radius:6px;padding:8px;margin-bottom:10px;font-size:9px;color:#856404">
+            ⚠️ <strong>Age Verification Required:</strong> Spider-Man 2 is rated M (17+). DOB confirmation needed at checkout.
+          </div>
+          <!-- items -->
+          <div style="border:1px solid #eee;border-radius:8px;padding:8px;margin-bottom:8px;display:flex;gap:8px;align-items:center">
+            <div style="background:#2c2c54;width:45px;height:45px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🎮</div>
+            <div style="flex:1">
+              <div style="font-size:10px;font-weight:700">Spider-Man 2</div>
+              <div style="font-size:8px;color:#888">PS5 · New</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                <button style="border:1px solid #ccc;background:#f5f5f5;width:18px;height:18px;border-radius:3px;font-size:10px;cursor:pointer">−</button>
+                <span style="font-size:10px;font-weight:700">1</span>
+                <button style="border:1px solid #ccc;background:#f5f5f5;width:18px;height:18px;border-radius:3px;font-size:10px;cursor:pointer">+</button>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;font-weight:900;color:#c8102e">$69.99</div>
+              <div style="font-size:8px;color:#c8102e;cursor:pointer;margin-top:4px">Remove</div>
+            </div>
+          </div>
+          <div style="border:1px solid #eee;border-radius:8px;padding:8px;margin-bottom:10px;display:flex;gap:8px;align-items:center">
+            <div style="background:#1a3a1a;width:45px;height:45px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚔️</div>
+            <div style="flex:1">
+              <div style="font-size:10px;font-weight:700">Zelda: TotK</div>
+              <div style="font-size:8px;color:#888">Switch · New</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px">
+                <button style="border:1px solid #ccc;background:#f5f5f5;width:18px;height:18px;border-radius:3px;font-size:10px;cursor:pointer">−</button>
+                <span style="font-size:10px;font-weight:700">1</span>
+                <button style="border:1px solid #ccc;background:#f5f5f5;width:18px;height:18px;border-radius:3px;font-size:10px;cursor:pointer">+</button>
+              </div>
+            </div>
+            <div style="text-align:right">
+              <div style="font-size:11px;font-weight:900;color:#c8102e">$59.99</div>
+              <div style="font-size:8px;color:#c8102e;cursor:pointer;margin-top:4px">Remove</div>
+            </div>
+          </div>
+          <!-- promo code -->
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            <input placeholder="Promo code" style="flex:1;border:1px solid #ccc;border-radius:4px;padding:5px 8px;font-size:10px"/>
+            <button style="background:#c8102e;color:#fff;border:none;border-radius:4px;padding:5px 10px;font-size:10px;font-weight:700;cursor:pointer">Apply</button>
+          </div>
+          <!-- totals -->
+          <div style="border-top:2px solid #eee;padding-top:10px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span>Subtotal</span><span>$129.98</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px;color:#27ae60"><span>Discount</span><span>-$0.00</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;margin-bottom:4px"><span>Tax (11.5%)</span><span>$14.95</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:900;margin-top:6px"><span>TOTAL</span><span style="color:#c8102e">$144.93</span></div>
+            <button style="width:100%;background:#c8102e;color:#fff;border:none;border-radius:6px;padding:10px;font-size:11px;font-weight:700;margin-top:10px;cursor:pointer">Proceed to Checkout →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: TRADE-IN -->
+      <div class="proto-screen">
+        <div class="proto-bar">
+          <div class="proto-dots">
+            <div style="background:#ff5f57"></div>
+            <div style="background:#febc2e"></div>
+            <div style="background:#28c840"></div>
+          </div>
+          <span>♻️ Trade-In Form</span>
+        </div>
+        <div class="proto-body">
+          <div style="background:#c8102e;margin:-16px -16px 12px;padding:8px 12px">
+            <span style="color:#fff;font-weight:900;font-size:13px;font-family:'Rajdhani',sans-serif">♻️ Trade-In Your Game</span>
+          </div>
+          <div style="margin-bottom:10px">
+            <label style="font-size:10px;font-weight:700;color:#333;display:block;margin-bottom:4px">Game Title / SKU</label>
+            <input value="Spider-Man: Miles Morales (PS5)" style="width:100%;border:1px solid #ccc;border-radius:4px;padding:6px 8px;font-size:10px"/>
+          </div>
+          <div style="margin-bottom:10px">
+            <label style="font-size:10px;font-weight:700;color:#333;display:block;margin-bottom:4px">Condition</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+              <div style="border:2px solid #27ae60;border-radius:6px;padding:8px;text-align:center;background:#eafaf1">
+                <div style="font-size:16px">⭐</div>
+                <div style="font-size:9px;font-weight:700;color:#145a32">New</div>
+                <div style="font-size:8px;color:#888">×1.0</div>
+              </div>
+              <div style="border:2px solid #c8102e;border-radius:6px;padding:8px;text-align:center;background:#fff8f8">
+                <div style="font-size:16px">✅</div>
+                <div style="font-size:9px;font-weight:700;color:#c8102e">Good ✓</div>
+                <div style="font-size:8px;color:#888">×0.7</div>
+              </div>
+              <div style="border:2px solid #ccc;border-radius:6px;padding:8px;text-align:center">
+                <div style="font-size:16px">⚠️</div>
+                <div style="font-size:9px;font-weight:700;color:#555">Fair</div>
+                <div style="font-size:8px;color:#888">×0.5</div>
+              </div>
+              <div style="border:2px solid #ccc;border-radius:6px;padding:8px;text-align:center">
+                <div style="font-size:16px">🔧</div>
+                <div style="font-size:9px;font-weight:700;color:#555">Poor</div>
+                <div style="font-size:8px;color:#888">×0.3</div>
+              </div>
+            </div>
+          </div>
+          <!-- credit estimate box -->
+          <div style="background:#d5f5e3;border:2px solid #27ae60;border-radius:8px;padding:12px;margin-bottom:10px;text-align:center">
+            <div style="font-size:9px;color:#145a32;font-weight:700;margin-bottom:4px">Estimated Store Credit</div>
+            <div style="font-size:26px;font-weight:900;color:#145a32">$17.50</div>
+            <div style="font-size:9px;color:#555">Base $25.00 × 0.7 (Good) = $17.50</div>
+          </div>
+          <div style="margin-bottom:10px">
+            <label style="font-size:10px;font-weight:700;color:#333;display:block;margin-bottom:4px">Clerk ID (Auto-filled)</label>
+            <input value="CLK-2041 · Maria Santos" style="width:100%;border:1px solid #ccc;border-radius:4px;padding:6px 8px;font-size:10px;background:#f9f9f9" readonly/>
+          </div>
+          <button style="width:100%;background:#27ae60;color:#fff;border:none;border-radius:6px;padding:10px;font-size:11px;font-weight:700;cursor:pointer">Confirm Trade-In — $17.50 Credit</button>
+        </div>
+      </div>
+
+      <!-- SCREEN 4: ACCOUNT LOCKOUT -->
+      <div class="proto-screen">
+        <div class="proto-bar">
+          <div class="proto-dots">
+            <div style="background:#ff5f57"></div>
+            <div style="background:#febc2e"></div>
+            <div style="background:#28c840"></div>
+          </div>
+          <span>🔒 Account Lockout</span>
+        </div>
+        <div class="proto-body">
+          <div style="background:#c8102e;margin:-16px -16px 12px;padding:8px 12px">
+            <span style="color:#fff;font-weight:900;font-size:13px;font-family:'Rajdhani',sans-serif">GAMESTOP — Sign In</span>
+          </div>
+          <!-- lockout alert -->
+          <div style="background:#fdecea;border:2px solid #c8102e;border-radius:8px;padding:14px;text-align:center;margin-bottom:14px">
+            <div style="font-size:28px;margin-bottom:6px">🔒</div>
+            <div style="font-size:12px;font-weight:900;color:#c8102e;margin-bottom:4px">Account Temporarily Locked</div>
+            <div style="font-size:9px;color:#7b241c;margin-bottom:10px">Too many failed login attempts (3/3).</div>
+            <!-- timer -->
+            <div style="background:#fff;border-radius:8px;padding:8px;display:inline-block">
+              <div style="font-size:9px;color:#555;margin-bottom:2px">Unlocks in</div>
+              <div style="font-size:22px;font-weight:900;color:#c8102e;font-family:'Share Tech Mono','Courier New',monospace">28:47</div>
+            </div>
+          </div>
+          <!-- login form (disabled) -->
+          <div style="opacity:0.45">
+            <div style="margin-bottom:8px">
+              <label style="font-size:10px;font-weight:700;color:#333;display:block;margin-bottom:3px">Email</label>
+              <input value="user@example.com" disabled style="width:100%;border:1px solid #ccc;border-radius:4px;padding:6px 8px;font-size:10px;background:#f5f5f5"/>
+            </div>
+            <div style="margin-bottom:10px">
+              <label style="font-size:10px;font-weight:700;color:#333;display:block;margin-bottom:3px">Password</label>
+              <input type="password" value="password" disabled style="width:100%;border:1px solid #ccc;border-radius:4px;padding:6px 8px;font-size:10px;background:#f5f5f5"/>
+            </div>
+            <button disabled style="width:100%;background:#ccc;color:#fff;border:none;border-radius:6px;padding:10px;font-size:11px;font-weight:700;cursor:not-allowed">Sign In (Locked)</button>
+          </div>
+          <!-- actions -->
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:6px">
+            <button style="width:100%;background:transparent;color:#4a90d9;border:1.5px solid #4a90d9;border-radius:6px;padding:8px;font-size:10px;font-weight:700;cursor:pointer">📧 Send Password Reset Email</button>
+            <button style="width:100%;background:transparent;color:#888;border:1.5px solid #ccc;border-radius:6px;padding:8px;font-size:10px;cursor:pointer">Contact Support</button>
+          </div>
+          <div style="text-align:center;margin-top:10px;font-size:9px;color:#888">A notification was sent to your registered email address.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function showSeq(idx, btn) {
+    [0,1,2].forEach(i => {
+      const el = document.getElementById('seq' + i);
+      if(el) el.style.display = i === idx ? 'block' : 'none';
+    });
+    document.querySelectorAll('.seq-badge').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+</script>
+</body>
+</html>
